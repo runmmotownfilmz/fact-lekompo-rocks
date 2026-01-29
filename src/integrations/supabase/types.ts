@@ -14,7 +14,174 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          billboard_image_url: string | null
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          ticket_price: number | null
+          ticket_url: string | null
+          title: string
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          billboard_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          ticket_price?: number | null
+          ticket_url?: string | null
+          title: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          billboard_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          ticket_price?: number | null
+          ticket_url?: string | null
+          title?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          is_producer: boolean | null
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_producer?: boolean | null
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_producer?: boolean | null
+          updated_at?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      sponsors: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          logo_url: string
+          name: string
+          tier: string | null
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          logo_url: string
+          name: string
+          tier?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string
+          name?: string
+          tier?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      uploads: {
+        Row: {
+          bpm: number | null
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          downloads_count: number | null
+          file_url: string | null
+          genre: string | null
+          id: string
+          is_published: boolean | null
+          plays_count: number | null
+          price: number | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bpm?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          file_url?: string | null
+          genre?: string | null
+          id?: string
+          is_published?: boolean | null
+          plays_count?: number | null
+          price?: number | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bpm?: number | null
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          file_url?: string | null
+          genre?: string | null
+          id?: string
+          is_published?: boolean | null
+          plays_count?: number | null
+          price?: number | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
