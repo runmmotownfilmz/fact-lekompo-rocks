@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Menu, X, Music } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Menu, X, Music, Upload, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { name: "Home", href: "#home" },
-  { name: "Events", href: "#events" },
+  { name: "Events", href: "#billboards" },
   { name: "Lifestyle", href: "#lifestyle" },
   { name: "Beat Exchange", href: "#beats" },
   { name: "Merch", href: "#merch" },
@@ -13,6 +15,13 @@ const navLinks = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    setIsOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -42,11 +51,39 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Button variant="hero" size="lg">
-              Get Tickets
-            </Button>
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/upload")}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/auth")}
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+                <Button variant="hero" size="lg">
+                  Get Tickets
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -72,9 +109,46 @@ const Navbar = () => {
                   {link.name}
                 </a>
               ))}
-              <Button variant="hero" size="lg" className="mt-4">
-                Get Tickets
-              </Button>
+              
+              <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
+                {user ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        navigate("/upload");
+                        setIsOpen(false);
+                      }}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Music
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        navigate("/auth");
+                        setIsOpen(false);
+                      }}
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Sign In / Sign Up
+                    </Button>
+                    <Button variant="hero" size="lg">
+                      Get Tickets
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
