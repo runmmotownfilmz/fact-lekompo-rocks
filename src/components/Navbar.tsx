@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X, Music, Upload, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+ import { CartDrawer } from "@/components/CartDrawer";
 
 const navLinks = [
   { name: "Home", href: "#home" },
@@ -10,6 +11,7 @@ const navLinks = [
   { name: "Lifestyle", href: "#lifestyle" },
   { name: "Beat Exchange", href: "#beats" },
   { name: "Merch", href: "#merch" },
+   { name: "Videos", href: "#videos" },
   { name: "Podcast", href: "#podcast" },
 ];
 
@@ -53,6 +55,7 @@ const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
+           <CartDrawer />
             {user ? (
               <>
                 <Button
@@ -111,6 +114,9 @@ const Navbar = () => {
               ))}
               
               <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
+               <div className="flex justify-center mb-2">
+                 <CartDrawer />
+               </div>
                 {user ? (
                   <>
                     <Button
