@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, Music, Upload, User, LogOut } from "lucide-react";
+import { Menu, X, Upload, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
- import { CartDrawer } from "@/components/CartDrawer";
+import { CartDrawer } from "@/components/CartDrawer";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", href: "#home" },
@@ -31,13 +32,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Music className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display text-xl tracking-wide text-foreground">FACT</span>
-              <span className="text-xs text-primary -mt-1">LEKOMPO ROCKS</span>
-            </div>
+            <img src={logo} alt="FACT Lekompo Rocks" className="h-12 w-auto group-hover:scale-110 transition-transform" />
           </a>
 
           {/* Desktop Navigation */}
