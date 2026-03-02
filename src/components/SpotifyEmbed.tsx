@@ -12,14 +12,14 @@ const spotifyItems: SpotifyTrack[] = [
   {
     id: "1",
     type: "playlist",
-    spotifyUri: "37i9dQZF1DX5Ejj0EkURtP",
-    title: "Lekompo Vibes",
+    spotifyUri: "5zYzybQqM4UaM65aT5mOPT",
+    title: "Lekompo Hit Songs ❤️‍🔥💥",
   },
   {
     id: "2",
     type: "playlist",
-    spotifyUri: "37i9dQZF1DWYkaDif7Ztbx",
-    title: "South African House",
+    spotifyUri: "53MeFThN5jkOHrajRFYnvd",
+    title: "Best Lekompo Hits 2026",
   },
 ];
 
