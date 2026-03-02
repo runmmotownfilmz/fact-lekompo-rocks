@@ -49,23 +49,19 @@ const Podcast = () => {
               cultural figures from Limpopo and beyond.
             </p>
 
-            {/* Podcast Image */}
-            <div className="relative rounded-2xl overflow-hidden mb-8 group">
-              <img
-                src={podcastImg}
-                alt="Lekompo Podcast Studio"
-                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+            {/* Podcast Video Embed */}
+            <div className="relative rounded-2xl overflow-hidden mb-8 aspect-video">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/F50WUeL9uZo?si=n3JRzucb6XhyV8b5"
+                title="Lekompo Podcast"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full rounded-2xl"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Now Playing</p>
-                  <p className="font-semibold">EP 45: The Future of Lekompo</p>
-                </div>
-                <button className="w-14 h-14 rounded-full bg-primary flex items-center justify-center hover:scale-110 transition-transform">
-                  <Play className="w-6 h-6 text-primary-foreground ml-1" />
-                </button>
-              </div>
             </div>
 
             {/* Subscribe CTA */}
