@@ -125,6 +125,7 @@ const Navbar = () => {
                   >
                     {link.name}
                   </a>
+              )
               )}
               
               <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
