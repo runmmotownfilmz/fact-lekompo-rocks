@@ -9,10 +9,10 @@ import logo from "@/assets/logo.png";
 const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Events", href: "#billboards" },
-  { name: "Lifestyle", href: "#lifestyle" },
+  { name: "Discover", href: "/discover", isRoute: true },
   { name: "Beat Exchange", href: "#beats" },
+  { name: "Playlists", href: "/playlists", isRoute: true },
   { name: "Merch", href: "#merch" },
-   { name: "Videos", href: "#videos" },
   { name: "Podcast", href: "#podcast" },
 ];
 
@@ -37,15 +37,25 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              (link as any).isRoute ? (
+                <span
+                  key={link.name}
+                  onClick={() => navigate(link.href)}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  {link.name}
+                </span>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
+            )}
           </div>
 
           {/* Auth Buttons */}
@@ -97,16 +107,26 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                (link as any).isRoute ? (
+                  <span
+                    key={link.name}
+                    className="text-lg font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
+                    onClick={() => { navigate(link.href); setIsOpen(false); }}
+                  >
+                    {link.name}
+                  </span>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </a>
+              )
+              )}
               
               <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
                <div className="flex justify-center mb-2">
