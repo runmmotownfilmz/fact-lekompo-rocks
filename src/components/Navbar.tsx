@@ -107,12 +107,25 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsOpen(false)}
+              {navLinks.map((link) =>
+                (link as any).isRoute ? (
+                  <span
+                    key={link.name}
+                    className="text-lg font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
+                    onClick={() => { navigate(link.href); setIsOpen(false); }}
+                  >
+                    {link.name}
+                  </span>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </a>
+                )
                 >
                   {link.name}
                 </a>
