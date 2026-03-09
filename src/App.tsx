@@ -8,7 +8,10 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Upload from "./pages/Upload";
 import Sponsors from "./pages/Sponsors";
- import ProductDetail from "./pages/ProductDetail";
+import ProductDetail from "./pages/ProductDetail";
+import ArtistProfile from "./pages/ArtistProfile";
+import Discover from "./pages/Discover";
+import Playlists from "./pages/Playlists";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,7 +28,10 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/sponsors" element={<Sponsors />} />
-           <Route path="/product/:handle" element={<ProductDetail />} />
+            <Route path="/product/:handle" element={<ProductDetail />} />
+            <Route path="/artist/:userId" element={<ArtistProfile />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/playlists" element={<Playlists />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

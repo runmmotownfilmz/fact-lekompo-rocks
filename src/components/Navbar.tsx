@@ -37,15 +37,25 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-              >
-                {link.name}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              (link as any).isRoute ? (
+                <span
+                  key={link.name}
+                  onClick={() => navigate(link.href)}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  {link.name}
+                </span>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
+            )}
           </div>
 
           {/* Auth Buttons */}
