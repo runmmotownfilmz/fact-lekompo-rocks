@@ -9,10 +9,10 @@ import logo from "@/assets/logo.png";
 const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Events", href: "#billboards" },
-  { name: "Lifestyle", href: "#lifestyle" },
+  { name: "Discover", href: "/discover", isRoute: true },
   { name: "Beat Exchange", href: "#beats" },
+  { name: "Playlists", href: "/playlists", isRoute: true },
   { name: "Merch", href: "#merch" },
-   { name: "Videos", href: "#videos" },
   { name: "Podcast", href: "#podcast" },
 ];
 
