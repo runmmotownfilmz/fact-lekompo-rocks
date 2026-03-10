@@ -301,15 +301,15 @@ const Dashboard = () => {
                             {(upload.downloads_count || 0).toLocaleString()}
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
-                            <span
-                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                upload.is_published
-                                  ? "bg-primary/10 text-primary"
-                                  : "bg-muted text-muted-foreground"
-                              }`}
-                            >
-                              {upload.is_published ? "Published" : "Draft"}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={!!upload.is_published}
+                                onCheckedChange={() => handleTogglePublish(upload)}
+                              />
+                              <span className={`text-xs ${upload.is_published ? "text-primary" : "text-muted-foreground"}`}>
+                                {upload.is_published ? "Live" : "Draft"}
+                              </span>
+                            </div>
                           </TableCell>
                           <TableCell className="hidden lg:table-cell text-muted-foreground text-sm">
                             {new Date(upload.created_at).toLocaleDateString()}
