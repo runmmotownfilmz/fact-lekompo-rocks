@@ -13,6 +13,7 @@ const navLinks = [
   { name: "Beat Exchange", href: "#beats" },
   { name: "Playlists", href: "/playlists", isRoute: true },
   { name: "Merch", href: "#merch" },
+  { name: "Learn", href: "/learn", isRoute: true },
   { name: "Podcast", href: "#podcast" },
 ];
 
