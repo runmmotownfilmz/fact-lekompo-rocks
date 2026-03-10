@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, Upload, User, LogOut, BarChart3 } from "lucide-react";
+import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -13,6 +13,7 @@ const navLinks = [
   { name: "Beat Exchange", href: "#beats" },
   { name: "Playlists", href: "/playlists", isRoute: true },
   { name: "Merch", href: "#merch" },
+  { name: "Learn", href: "/learn", isRoute: true },
   { name: "Podcast", href: "#podcast" },
 ];
 

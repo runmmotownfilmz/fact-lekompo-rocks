@@ -13,6 +13,7 @@ import ArtistProfile from "./pages/ArtistProfile";
 import Discover from "./pages/Discover";
 import Playlists from "./pages/Playlists";
 import Dashboard from "./pages/Dashboard";
+import Learn from "./pages/Learn";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/discover" element={<Discover />} />
             <Route path="/playlists" element={<Playlists />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/learn" element={<Learn />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

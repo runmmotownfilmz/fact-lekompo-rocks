@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3, Calendar } from "lucide-react";
+import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
 import Navbar from "@/components/Navbar";
 import {
   Table,
@@ -73,12 +74,29 @@ const Dashboard = () => {
     setFetching(false);
   };
 
+  const handleTogglePublish = async (upload: Upload) => {
+    const newStatus = !upload.is_published;
+    const { error } = await supabase
+      .from("uploads")
+      .update({ is_published: newStatus })
+      .eq("id", upload.id);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    setUploads((prev) =>
+      prev.map((u) => (u.id === upload.id ? { ...u, is_published: newStatus } : u))
+    );
+    toast({ title: newStatus ? "Published" : "Unpublished", description: `"${upload.title}" is now ${newStatus ? "live" : "a draft"}.` });
+  };
+
   const handleDelete = async (upload: Upload) => {
     if (!confirm(`Delete "${upload.title}"? This cannot be undone.`)) return;
     setDeleting(upload.id);
 
     try {
-      // Delete file from storage if exists
       if (upload.file_url) {
         const path = upload.file_url.split("/uploads/")[1];
         if (path) await supabase.storage.from("uploads").remove([decodeURIComponent(path)]);
@@ -283,15 +301,15 @@ const Dashboard = () => {
                             {(upload.downloads_count || 0).toLocaleString()}
                           </TableCell>
                           <TableCell className="hidden md:table-cell">
-                            <span
-                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                                upload.is_published
-                                  ? "bg-primary/10 text-primary"
-                                  : "bg-muted text-muted-foreground"
-                              }`}
-                            >
-                              {upload.is_published ? "Published" : "Draft"}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={!!upload.is_published}
+                                onCheckedChange={() => handleTogglePublish(upload)}
+                              />
+                              <span className={`text-xs ${upload.is_published ? "text-primary" : "text-muted-foreground"}`}>
+                                {upload.is_published ? "Live" : "Draft"}
+                              </span>
+                            </div>
                           </TableCell>
                           <TableCell className="hidden lg:table-cell text-muted-foreground text-sm">
                             {new Date(upload.created_at).toLocaleDateString()}
