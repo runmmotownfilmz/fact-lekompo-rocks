@@ -12,6 +12,7 @@ import ProductDetail from "./pages/ProductDetail";
 import ArtistProfile from "./pages/ArtistProfile";
 import Discover from "./pages/Discover";
 import Playlists from "./pages/Playlists";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
