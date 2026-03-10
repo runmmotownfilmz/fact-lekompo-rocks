@@ -142,6 +142,16 @@ const Navbar = () => {
                 {user ? (
                   <>
                     <Button
+                      variant="ghost"
+                      onClick={() => {
+                        navigate("/dashboard");
+                        setIsOpen(false);
+                      }}
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Button>
+                    <Button
                       variant="outline"
                       onClick={() => {
                         navigate("/upload");
