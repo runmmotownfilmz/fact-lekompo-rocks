@@ -74,12 +74,29 @@ const Dashboard = () => {
     setFetching(false);
   };
 
+  const handleTogglePublish = async (upload: Upload) => {
+    const newStatus = !upload.is_published;
+    const { error } = await supabase
+      .from("uploads")
+      .update({ is_published: newStatus })
+      .eq("id", upload.id);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    setUploads((prev) =>
+      prev.map((u) => (u.id === upload.id ? { ...u, is_published: newStatus } : u))
+    );
+    toast({ title: newStatus ? "Published" : "Unpublished", description: `"${upload.title}" is now ${newStatus ? "live" : "a draft"}.` });
+  };
+
   const handleDelete = async (upload: Upload) => {
     if (!confirm(`Delete "${upload.title}"? This cannot be undone.`)) return;
     setDeleting(upload.id);
 
     try {
-      // Delete file from storage if exists
       if (upload.file_url) {
         const path = upload.file_url.split("/uploads/")[1];
         if (path) await supabase.storage.from("uploads").remove([decodeURIComponent(path)]);
