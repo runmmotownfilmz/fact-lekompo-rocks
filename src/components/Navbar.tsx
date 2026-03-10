@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, Upload, User, LogOut } from "lucide-react";
+import { Menu, X, Upload, User, LogOut, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -63,6 +63,13 @@ const Navbar = () => {
            <CartDrawer />
             {user ? (
               <>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate("/upload")}
@@ -134,6 +141,16 @@ const Navbar = () => {
                </div>
                 {user ? (
                   <>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        navigate("/dashboard");
+                        setIsOpen(false);
+                      }}
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Button>
                     <Button
                       variant="outline"
                       onClick={() => {
