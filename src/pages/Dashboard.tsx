@@ -1,26 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3 } from "lucide-react";
+import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3, FolderKanban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import Navbar from "@/components/Navbar";
+import ProjectList from "@/components/dashboard/ProjectList";
+import ProjectDetail from "@/components/dashboard/ProjectDetail";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
+  ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig,
 } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
@@ -40,10 +35,7 @@ interface Upload {
 }
 
 const chartConfig = {
-  plays: {
-    label: "Plays",
-    color: "hsl(var(--primary))",
-  },
+  plays: { label: "Plays", color: "hsl(var(--primary))" },
 } satisfies ChartConfig;
 
 const Dashboard = () => {
@@ -55,9 +47,14 @@ const Dashboard = () => {
   const [fetching, setFetching] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  // Projects state
+  const [projects, setProjects] = useState<any[]>([]);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+
   useEffect(() => {
     if (!user) return;
     fetchUploads();
+    fetchProjects();
   }, [user]);
 
   const fetchUploads = async () => {
@@ -68,34 +65,32 @@ const Dashboard = () => {
       .select("id, title, type, genre, plays_count, downloads_count, is_published, created_at, cover_image_url, file_url, bpm, price")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-
     if (data) setUploads(data);
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     setFetching(false);
   };
 
+  const fetchProjects = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("projects")
+      .select("id, title, description, status, genre, featured_artist, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (data) setProjects(data);
+  };
+
   const handleTogglePublish = async (upload: Upload) => {
     const newStatus = !upload.is_published;
-    const { error } = await supabase
-      .from("uploads")
-      .update({ is_published: newStatus })
-      .eq("id", upload.id);
-
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      return;
-    }
-
-    setUploads((prev) =>
-      prev.map((u) => (u.id === upload.id ? { ...u, is_published: newStatus } : u))
-    );
+    const { error } = await supabase.from("uploads").update({ is_published: newStatus }).eq("id", upload.id);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    setUploads((prev) => prev.map((u) => (u.id === upload.id ? { ...u, is_published: newStatus } : u)));
     toast({ title: newStatus ? "Published" : "Unpublished", description: `"${upload.title}" is now ${newStatus ? "live" : "a draft"}.` });
   };
 
   const handleDelete = async (upload: Upload) => {
     if (!confirm(`Delete "${upload.title}"? This cannot be undone.`)) return;
     setDeleting(upload.id);
-
     try {
       if (upload.file_url) {
         const path = upload.file_url.split("/uploads/")[1];
@@ -105,45 +100,27 @@ const Dashboard = () => {
         const path = upload.cover_image_url.split("/uploads/")[1];
         if (path) await supabase.storage.from("uploads").remove([decodeURIComponent(path)]);
       }
-
       const { error } = await supabase.from("uploads").delete().eq("id", upload.id);
       if (error) throw error;
-
       setUploads((prev) => prev.filter((u) => u.id !== upload.id));
       toast({ title: "Deleted", description: `"${upload.title}" has been removed.` });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setDeleting(null);
-    }
+    } finally { setDeleting(null); }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
+  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (!user) { navigate("/auth"); return null; }
 
   const totalPlays = uploads.reduce((sum, u) => sum + (u.plays_count || 0), 0);
   const totalDownloads = uploads.reduce((sum, u) => sum + (u.downloads_count || 0), 0);
   const publishedCount = uploads.filter((u) => u.is_published).length;
 
-  // Chart data: top 10 tracks by plays
   const chartData = uploads
     .filter((u) => (u.plays_count || 0) > 0)
     .sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0))
     .slice(0, 10)
-    .map((u) => ({
-      name: u.title.length > 15 ? u.title.slice(0, 15) + "…" : u.title,
-      plays: u.plays_count || 0,
-    }));
+    .map((u) => ({ name: u.title.length > 15 ? u.title.slice(0, 15) + "…" : u.title, plays: u.plays_count || 0 }));
 
   return (
     <div className="min-h-screen bg-background">
@@ -170,173 +147,135 @@ const Dashboard = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Disc className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display">{uploads.length}</p>
-                  <p className="text-xs text-muted-foreground">Total Tracks</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Play className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display">{totalPlays.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Total Plays</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display">{totalDownloads.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Downloads</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display">{publishedCount}</p>
-                  <p className="text-xs text-muted-foreground">Published</p>
-                </div>
-              </CardContent>
-            </Card>
+            {[
+              { icon: Disc, value: uploads.length, label: "Total Tracks" },
+              { icon: Play, value: totalPlays.toLocaleString(), label: "Total Plays" },
+              { icon: TrendingUp, value: totalDownloads.toLocaleString(), label: "Downloads" },
+              { icon: Eye, value: publishedCount, label: "Published" },
+            ].map(({ icon: Icon, value, label }) => (
+              <Card key={label} className="bg-card border-border">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-display">{value}</p>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
-          {/* Chart */}
-          {chartData.length > 0 && (
-            <Card className="bg-card border-border mb-8">
-              <CardHeader>
-                <CardTitle className="text-lg font-display tracking-wide">TOP TRACKS BY PLAYS</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                  <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
-                    <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="plays" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-          )}
+          {/* Main Tabs: Uploads & Projects */}
+          <Tabs defaultValue="uploads" className="w-full">
+            <TabsList className="mb-6 bg-muted/50">
+              <TabsTrigger value="uploads"><Music className="w-3.5 h-3.5 mr-1.5" />Uploads</TabsTrigger>
+              <TabsTrigger value="projects"><FolderKanban className="w-3.5 h-3.5 mr-1.5" />Projects</TabsTrigger>
+            </TabsList>
 
-          {/* Uploads Table */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-lg font-display tracking-wide">YOUR UPLOADS</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {fetching ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                </div>
-              ) : uploads.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Music className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No uploads yet. Start sharing your music!</p>
-                  <Button variant="outline" className="mt-4" onClick={() => navigate("/upload")}>
-                    Upload Your First Track
-                  </Button>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-border">
-                        <TableHead>Track</TableHead>
-                        <TableHead className="hidden sm:table-cell">Type</TableHead>
-                        <TableHead className="hidden md:table-cell">Genre</TableHead>
-                        <TableHead className="text-right">Plays</TableHead>
-                        <TableHead className="hidden sm:table-cell text-right">Downloads</TableHead>
-                        <TableHead className="hidden md:table-cell">Status</TableHead>
-                        <TableHead className="hidden lg:table-cell">Date</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {uploads.map((upload) => (
-                        <TableRow key={upload.id} className="border-border">
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              {upload.cover_image_url ? (
-                                <img
-                                  src={upload.cover_image_url}
-                                  alt={upload.title}
-                                  className="w-10 h-10 rounded object-cover"
-                                />
-                              ) : (
-                                <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
-                                  <Music className="w-4 h-4 text-muted-foreground" />
-                                </div>
-                              )}
-                              <span className="font-medium truncate max-w-[150px]">{upload.title}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell capitalize text-muted-foreground">
-                            {upload.type.replace("_", " ")}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-muted-foreground">
-                            {upload.genre || "—"}
-                          </TableCell>
-                          <TableCell className="text-right font-medium">
-                            {(upload.plays_count || 0).toLocaleString()}
-                          </TableCell>
-                          <TableCell className="hidden sm:table-cell text-right text-muted-foreground">
-                            {(upload.downloads_count || 0).toLocaleString()}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <div className="flex items-center gap-2">
-                              <Switch
-                                checked={!!upload.is_published}
-                                onCheckedChange={() => handleTogglePublish(upload)}
-                              />
-                              <span className={`text-xs ${upload.is_published ? "text-primary" : "text-muted-foreground"}`}>
-                                {upload.is_published ? "Live" : "Draft"}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden lg:table-cell text-muted-foreground text-sm">
-                            {new Date(upload.created_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(upload)}
-                              disabled={deleting === upload.id}
-                              className="text-muted-foreground hover:text-destructive"
-                            >
-                              {deleting === upload.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="w-4 h-4" />
-                              )}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+            {/* UPLOADS TAB */}
+            <TabsContent value="uploads" className="space-y-6">
+              {chartData.length > 0 && (
+                <Card className="bg-card border-border">
+                  <CardHeader><CardTitle className="text-lg font-display tracking-wide">TOP TRACKS BY PLAYS</CardTitle></CardHeader>
+                  <CardContent>
+                    <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                      <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="name" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                        <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <Bar dataKey="plays" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ChartContainer>
+                  </CardContent>
+                </Card>
               )}
-            </CardContent>
-          </Card>
+
+              <Card className="bg-card border-border">
+                <CardHeader><CardTitle className="text-lg font-display tracking-wide">YOUR UPLOADS</CardTitle></CardHeader>
+                <CardContent>
+                  {fetching ? (
+                    <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+                  ) : uploads.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Music className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No uploads yet. Start sharing your music!</p>
+                      <Button variant="outline" className="mt-4" onClick={() => navigate("/upload")}>Upload Your First Track</Button>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="border-border">
+                            <TableHead>Track</TableHead>
+                            <TableHead className="hidden sm:table-cell">Type</TableHead>
+                            <TableHead className="hidden md:table-cell">Genre</TableHead>
+                            <TableHead className="text-right">Plays</TableHead>
+                            <TableHead className="hidden sm:table-cell text-right">Downloads</TableHead>
+                            <TableHead className="hidden md:table-cell">Status</TableHead>
+                            <TableHead className="hidden lg:table-cell">Date</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {uploads.map((upload) => (
+                            <TableRow key={upload.id} className="border-border">
+                              <TableCell>
+                                <div className="flex items-center gap-3">
+                                  {upload.cover_image_url ? (
+                                    <img src={upload.cover_image_url} alt={upload.title} className="w-10 h-10 rounded object-cover" />
+                                  ) : (
+                                    <div className="w-10 h-10 rounded bg-muted flex items-center justify-center"><Music className="w-4 h-4 text-muted-foreground" /></div>
+                                  )}
+                                  <span className="font-medium truncate max-w-[150px]">{upload.title}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="hidden sm:table-cell capitalize text-muted-foreground">{upload.type.replace("_", " ")}</TableCell>
+                              <TableCell className="hidden md:table-cell text-muted-foreground">{upload.genre || "—"}</TableCell>
+                              <TableCell className="text-right font-medium">{(upload.plays_count || 0).toLocaleString()}</TableCell>
+                              <TableCell className="hidden sm:table-cell text-right text-muted-foreground">{(upload.downloads_count || 0).toLocaleString()}</TableCell>
+                              <TableCell className="hidden md:table-cell">
+                                <div className="flex items-center gap-2">
+                                  <Switch checked={!!upload.is_published} onCheckedChange={() => handleTogglePublish(upload)} />
+                                  <span className={`text-xs ${upload.is_published ? "text-primary" : "text-muted-foreground"}`}>{upload.is_published ? "Live" : "Draft"}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="hidden lg:table-cell text-muted-foreground text-sm">{new Date(upload.created_at).toLocaleDateString()}</TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="icon" onClick={() => handleDelete(upload)} disabled={deleting === upload.id} className="text-muted-foreground hover:text-destructive">
+                                  {deleting === upload.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* PROJECTS TAB */}
+            <TabsContent value="projects">
+              {selectedProject ? (
+                <ProjectDetail
+                  projectId={selectedProject}
+                  userId={user.id}
+                  onBack={() => { setSelectedProject(null); fetchProjects(); }}
+                />
+              ) : (
+                <ProjectList
+                  projects={projects}
+                  userId={user.id}
+                  onSelect={setSelectedProject}
+                  onRefresh={fetchProjects}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
