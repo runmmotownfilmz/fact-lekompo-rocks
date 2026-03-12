@@ -285,7 +285,8 @@ const Dashboard = () => {
             </TabsContent>
 
             {/* PROJECTS TAB */}
-            <TabsContent value="projects">
+            <TabsContent value="projects" className="space-y-4">
+              <ProjectInvitations userId={user.id} onAccepted={fetchProjects} />
               {selectedProject ? (
                 <ProjectDetail
                   projectId={selectedProject}
