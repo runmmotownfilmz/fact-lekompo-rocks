@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CartDrawer } from "@/components/CartDrawer";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -19,8 +20,27 @@ const navLinks = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) { setPendingCount(0); return; }
+    const fetchPending = async () => {
+      const { count } = await supabase
+        .from("project_collaborators")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("status", "pending");
+      setPendingCount(count || 0);
+    };
+    fetchPending();
+    const channel = supabase
+      .channel("navbar-invites")
+      .on("postgres_changes", { event: "*", schema: "public", table: "project_collaborators" }, fetchPending)
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -67,9 +87,15 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/dashboard")}
+                  className="relative"
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Dashboard
+                  {pendingCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                      {pendingCount}
+                    </span>
+                  )}
                 </Button>
                 <Button
                   variant="outline"
@@ -144,6 +170,7 @@ const Navbar = () => {
                   <>
                     <Button
                       variant="ghost"
+                      className="relative"
                       onClick={() => {
                         navigate("/dashboard");
                         setIsOpen(false);
@@ -151,6 +178,11 @@ const Navbar = () => {
                     >
                       <BarChart3 className="w-4 h-4 mr-2" />
                       Dashboard
+                      {pendingCount > 0 && (
+                        <span className="ml-2 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                          {pendingCount}
+                        </span>
+                      )}
                     </Button>
                     <Button
                       variant="outline"
