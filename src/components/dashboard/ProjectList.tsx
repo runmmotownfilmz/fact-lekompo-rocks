@@ -15,6 +15,8 @@ interface Project {
   genre: string | null;
   featured_artist: string | null;
   created_at: string;
+  user_id?: string;
+  is_collab?: boolean;
 }
 
 interface ProjectListProps {
