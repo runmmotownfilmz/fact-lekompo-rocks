@@ -107,6 +107,9 @@ const ProjectList = ({ projects, userId, onSelect, onRefresh }: ProjectListProps
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium truncate">{p.title}</span>
+                    {p.is_collab && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-accent text-accent">Collab</Badge>
+                    )}
                     <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${STATUS_COLORS[p.status] || ""}`}>
                       {p.status}
                     </Badge>
