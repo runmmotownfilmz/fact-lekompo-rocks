@@ -170,6 +170,7 @@ const Navbar = () => {
                   <>
                     <Button
                       variant="ghost"
+                      className="relative"
                       onClick={() => {
                         navigate("/dashboard");
                         setIsOpen(false);
@@ -177,6 +178,12 @@ const Navbar = () => {
                     >
                       <BarChart3 className="w-4 h-4 mr-2" />
                       Dashboard
+                      {pendingCount > 0 && (
+                        <span className="ml-2 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                          {pendingCount}
+                        </span>
+                      )}
+                    </Button>
                     </Button>
                     <Button
                       variant="outline"
