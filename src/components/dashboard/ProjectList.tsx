@@ -15,6 +15,8 @@ interface Project {
   genre: string | null;
   featured_artist: string | null;
   created_at: string;
+  user_id?: string;
+  is_collab?: boolean;
 }
 
 interface ProjectListProps {
@@ -105,6 +107,9 @@ const ProjectList = ({ projects, userId, onSelect, onRefresh }: ProjectListProps
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium truncate">{p.title}</span>
+                    {p.is_collab && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-accent text-accent">Collab</Badge>
+                    )}
                     <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${STATUS_COLORS[p.status] || ""}`}>
                       {p.status}
                     </Badge>
@@ -116,15 +121,18 @@ const ProjectList = ({ projects, userId, onSelect, onRefresh }: ProjectListProps
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
-                    onClick={(e) => handleDelete(e, p.id, p.title)}
-                    disabled={deleting === p.id}
-                  >
-                    {deleting === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                  </Button>
+                  {!p.is_collab && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
+                      onClick={(e) => handleDelete(e, p.id, p.title)}
+                      disabled={deleting === p.id}
+                    >
+                      {deleting === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                    </Button>
+                  )}
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </div>
               </button>

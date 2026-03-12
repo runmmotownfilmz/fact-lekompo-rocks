@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import Navbar from "@/components/Navbar";
 import ProjectList from "@/components/dashboard/ProjectList";
 import ProjectDetail from "@/components/dashboard/ProjectDetail";
+import ProjectInvitations from "@/components/dashboard/ProjectInvitations";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -72,12 +73,37 @@ const Dashboard = () => {
 
   const fetchProjects = async () => {
     if (!user) return;
-    const { data } = await supabase
+    // Fetch owned projects
+    const { data: owned } = await supabase
       .from("projects")
-      .select("id, title, description, status, genre, featured_artist, created_at")
+      .select("id, title, description, status, genre, featured_artist, created_at, user_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-    if (data) setProjects(data);
+
+    // Fetch projects where user is an accepted collaborator
+    const { data: collabLinks } = await supabase
+      .from("project_collaborators")
+      .select("project_id")
+      .eq("user_id", user.id)
+      .eq("status", "accepted");
+
+    let collabProjects: any[] = [];
+    if (collabLinks && collabLinks.length > 0) {
+      const collabIds = collabLinks.map((c) => c.project_id);
+      const { data } = await supabase
+        .from("projects")
+        .select("id, title, description, status, genre, featured_artist, created_at, user_id")
+        .in("id", collabIds)
+        .order("created_at", { ascending: false });
+      if (data) collabProjects = data;
+    }
+
+    // Merge, owned first, mark collaborator projects
+    const all = [
+      ...(owned || []).map((p) => ({ ...p, is_collab: false })),
+      ...collabProjects.map((p) => ({ ...p, is_collab: true })),
+    ];
+    setProjects(all);
   };
 
   const handleTogglePublish = async (upload: Upload) => {
@@ -259,7 +285,8 @@ const Dashboard = () => {
             </TabsContent>
 
             {/* PROJECTS TAB */}
-            <TabsContent value="projects">
+            <TabsContent value="projects" className="space-y-4">
+              <ProjectInvitations userId={user.id} onAccepted={fetchProjects} />
               {selectedProject ? (
                 <ProjectDetail
                   projectId={selectedProject}
