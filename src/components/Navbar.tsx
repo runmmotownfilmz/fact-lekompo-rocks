@@ -184,7 +184,6 @@ const Navbar = () => {
                         </span>
                       )}
                     </Button>
-                    </Button>
                     <Button
                       variant="outline"
                       onClick={() => {
