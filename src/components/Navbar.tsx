@@ -84,7 +84,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-3">
            <CartDrawer />
             {user && <NotificationBell />}
-              <>
+            {user ? (
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/dashboard")}
