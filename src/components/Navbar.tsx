@@ -4,6 +4,7 @@ import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap } from "lucide-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CartDrawer } from "@/components/CartDrawer";
+import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
@@ -82,6 +83,7 @@ const Navbar = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
            <CartDrawer />
+            {user && <NotificationBell />}
             {user ? (
               <>
                 <Button
@@ -163,8 +165,9 @@ const Navbar = () => {
               )}
               
               <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
-               <div className="flex justify-center mb-2">
+               <div className="flex justify-center gap-2 mb-2">
                  <CartDrawer />
+                 {user && <NotificationBell />}
                </div>
                 {user ? (
                   <>
