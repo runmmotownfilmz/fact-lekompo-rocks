@@ -85,6 +85,7 @@ const Navbar = () => {
            <CartDrawer />
             {user && <NotificationBell />}
             {user ? (
+              <>
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/dashboard")}
