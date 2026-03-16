@@ -47,6 +47,9 @@ const NotificationBell = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         (payload) => {
+          const audio = new Audio('/sounds/notification.mp3');
+          audio.volume = 0.5;
+          audio.play().catch(() => {});
           setNotifications((prev) => [payload.new as Notification, ...prev].slice(0, 20));
         }
       )
