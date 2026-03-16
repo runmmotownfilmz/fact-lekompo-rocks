@@ -4,6 +4,7 @@ import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap } from "lucide-
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CartDrawer } from "@/components/CartDrawer";
+import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
