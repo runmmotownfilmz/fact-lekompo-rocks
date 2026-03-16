@@ -165,8 +165,9 @@ const Navbar = () => {
               )}
               
               <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3">
-               <div className="flex justify-center mb-2">
+               <div className="flex justify-center gap-2 mb-2">
                  <CartDrawer />
+                 {user && <NotificationBell />}
                </div>
                 {user ? (
                   <>
