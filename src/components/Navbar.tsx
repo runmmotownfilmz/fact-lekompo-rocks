@@ -83,7 +83,7 @@ const Navbar = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
            <CartDrawer />
-            {user ? (
+            {user && <NotificationBell />}
               <>
                 <Button
                   variant="ghost"
