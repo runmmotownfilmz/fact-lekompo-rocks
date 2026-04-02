@@ -199,6 +199,16 @@ const Navbar = () => {
                         </span>
                       )}
                     </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        className="text-primary"
+                        onClick={() => { navigate("/admin"); setIsOpen(false); }}
+                      >
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin Panel
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       onClick={() => {
