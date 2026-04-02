@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap } from "lucide-react";
+import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { CartDrawer } from "@/components/CartDrawer";
 import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
