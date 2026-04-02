@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap } from "lucide-react";
+import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { CartDrawer } from "@/components/CartDrawer";
 import NotificationBell from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,6 +101,16 @@ const Navbar = () => {
                     </span>
                   )}
                 </Button>
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/admin")}
+                    className="text-primary"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => navigate("/upload")}
@@ -187,6 +199,16 @@ const Navbar = () => {
                         </span>
                       )}
                     </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        className="text-primary"
+                        onClick={() => { navigate("/admin"); setIsOpen(false); }}
+                      >
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin Panel
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       onClick={() => {
