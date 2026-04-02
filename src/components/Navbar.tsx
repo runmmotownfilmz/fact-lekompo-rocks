@@ -101,6 +101,16 @@ const Navbar = () => {
                     </span>
                   )}
                 </Button>
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/admin")}
+                    className="text-primary"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => navigate("/upload")}
