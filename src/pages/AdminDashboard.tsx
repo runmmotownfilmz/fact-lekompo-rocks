@@ -21,6 +21,7 @@ import {
   Plus, Pencil, Trash2, Calendar, MapPin, Ticket,
   Star, Users, Music, Eye, EyeOff, Loader2, Shield
 } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 interface Event {
   id: string;
@@ -271,10 +272,12 @@ const AdminDashboard = () => {
                       <Label>Venue</Label>
                       <Input value={eventForm.venue} onChange={e => setEventForm(f => ({ ...f, venue: e.target.value }))} placeholder="Peter Mokaba Stadium" />
                     </div>
-                    <div>
-                      <Label>Billboard Image URL</Label>
-                      <Input value={eventForm.billboard_image_url} onChange={e => setEventForm(f => ({ ...f, billboard_image_url: e.target.value }))} placeholder="https://..." />
-                    </div>
+                    <ImageUpload
+                      value={eventForm.billboard_image_url}
+                      onChange={(url) => setEventForm(f => ({ ...f, billboard_image_url: url }))}
+                      label="Billboard Image"
+                      folder="admin/events"
+                    />
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label>Ticket Price (R)</Label>
@@ -412,10 +415,12 @@ const AdminDashboard = () => {
                           <Input value={lineupForm.stage} onChange={e => setLineupForm(f => ({ ...f, stage: e.target.value }))} placeholder="Main Stage" />
                         </div>
                       </div>
-                      <div>
-                        <Label>Artist Image URL</Label>
-                        <Input value={lineupForm.image_url} onChange={e => setLineupForm(f => ({ ...f, image_url: e.target.value }))} />
-                      </div>
+                    <ImageUpload
+                      value={lineupForm.image_url}
+                      onChange={(url) => setLineupForm(f => ({ ...f, image_url: url }))}
+                      label="Artist Photo"
+                      folder="admin/artists"
+                    />
                       <div className="flex items-center gap-2">
                         <Switch checked={lineupForm.is_headliner} onCheckedChange={v => setLineupForm(f => ({ ...f, is_headliner: v }))} />
                         <Label>Headliner</Label>
