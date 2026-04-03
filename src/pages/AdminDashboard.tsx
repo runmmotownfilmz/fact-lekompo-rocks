@@ -21,6 +21,7 @@ import {
   Plus, Pencil, Trash2, Calendar, MapPin, Ticket,
   Star, Users, Music, Eye, EyeOff, Loader2, Shield
 } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 interface Event {
   id: string;
