@@ -272,10 +272,12 @@ const AdminDashboard = () => {
                       <Label>Venue</Label>
                       <Input value={eventForm.venue} onChange={e => setEventForm(f => ({ ...f, venue: e.target.value }))} placeholder="Peter Mokaba Stadium" />
                     </div>
-                    <div>
-                      <Label>Billboard Image URL</Label>
-                      <Input value={eventForm.billboard_image_url} onChange={e => setEventForm(f => ({ ...f, billboard_image_url: e.target.value }))} placeholder="https://..." />
-                    </div>
+                    <ImageUpload
+                      value={eventForm.billboard_image_url}
+                      onChange={(url) => setEventForm(f => ({ ...f, billboard_image_url: url }))}
+                      label="Billboard Image"
+                      folder="admin/events"
+                    />
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label>Ticket Price (R)</Label>
