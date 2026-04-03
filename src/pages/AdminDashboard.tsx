@@ -501,6 +501,112 @@ const AdminDashboard = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
+                <Button
+                  variant="outline"
+                  disabled={!selectedEventId}
+                  onClick={() => bulkFileRef.current?.click()}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Bulk Upload
+                </Button>
+                <input
+                  ref={bulkFileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleBulkFilesSelected}
+                  className="hidden"
+                />
+
+                {/* Bulk Upload Dialog */}
+                <Dialog open={bulkDialogOpen} onOpenChange={(open) => {
+                  setBulkDialogOpen(open);
+                  if (!open) {
+                    bulkArtists.forEach(a => URL.revokeObjectURL(a.previewUrl));
+                    setBulkArtists([]);
+                  }
+                }}>
+                  <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Bulk Add Artists ({bulkArtists.length} photos)</DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-muted-foreground">
+                      Artist names are auto-detected from filenames. Edit details below before uploading.
+                    </p>
+                    <div className="space-y-4 mt-4">
+                      {bulkArtists.map((artist, idx) => (
+                        <div key={idx} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card">
+                          <img src={artist.previewUrl} alt="" className="w-14 h-14 rounded-full object-cover flex-shrink-0" />
+                          <div className="flex-1 space-y-2">
+                            <Input
+                              value={artist.name}
+                              onChange={e => {
+                                const updated = [...bulkArtists];
+                                updated[idx] = { ...updated[idx], name: e.target.value };
+                                setBulkArtists(updated);
+                              }}
+                              placeholder="Artist Name"
+                              className="font-medium"
+                            />
+                            <div className="grid grid-cols-2 gap-2">
+                              <Input
+                                value={artist.set_time}
+                                onChange={e => {
+                                  const updated = [...bulkArtists];
+                                  updated[idx] = { ...updated[idx], set_time: e.target.value };
+                                  setBulkArtists(updated);
+                                }}
+                                placeholder="Set time (e.g. 20:00)"
+                              />
+                              <Input
+                                value={artist.stage}
+                                onChange={e => {
+                                  const updated = [...bulkArtists];
+                                  updated[idx] = { ...updated[idx], stage: e.target.value };
+                                  setBulkArtists(updated);
+                                }}
+                                placeholder="Stage"
+                              />
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={artist.is_headliner}
+                                  onCheckedChange={v => {
+                                    const updated = [...bulkArtists];
+                                    updated[idx] = { ...updated[idx], is_headliner: v };
+                                    setBulkArtists(updated);
+                                  }}
+                                />
+                                <Label className="text-sm">Headliner</Label>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive"
+                                onClick={() => {
+                                  URL.revokeObjectURL(artist.previewUrl);
+                                  setBulkArtists(prev => prev.filter((_, i) => i !== idx));
+                                }}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <Button
+                        onClick={handleBulkUpload}
+                        disabled={bulkUploading || bulkArtists.length === 0}
+                        className="w-full"
+                        variant="hero"
+                      >
+                        {bulkUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+                        Upload & Add {bulkArtists.length} Artist{bulkArtists.length !== 1 ? "s" : ""}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
