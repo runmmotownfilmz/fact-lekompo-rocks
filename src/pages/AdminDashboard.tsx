@@ -208,6 +208,72 @@ const AdminDashboard = () => {
     else fetchLineup(selectedEventId!);
   };
 
+  const handleBulkFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const artists = files
+      .filter(f => f.type.startsWith("image/") && f.size <= 5 * 1024 * 1024)
+      .map(file => ({
+        file,
+        name: file.name.replace(/\.[^.]+$/, "").replace(/[_-]/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        stage: "Main Stage",
+        set_time: "",
+        is_headliner: false,
+        previewUrl: URL.createObjectURL(file),
+      }));
+    if (artists.length === 0) {
+      toast.error("No valid images selected (max 5MB each)");
+      return;
+    }
+    setBulkArtists(artists);
+    setBulkDialogOpen(true);
+  };
+
+  const handleBulkUpload = async () => {
+    if (!selectedEventId || bulkArtists.length === 0) return;
+    setBulkUploading(true);
+
+    const inserts = [];
+    for (let i = 0; i < bulkArtists.length; i++) {
+      const artist = bulkArtists[i];
+      const ext = artist.file.name.split(".").pop();
+      const path = `admin/artists/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error } = await supabase.storage.from("uploads").upload(path, artist.file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+      if (error) {
+        toast.error(`Failed to upload ${artist.name}: ${error.message}`);
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
+      inserts.push({
+        event_id: selectedEventId,
+        artist_name: artist.name,
+        set_time: artist.set_time || null,
+        stage: artist.stage || null,
+        is_headliner: artist.is_headliner,
+        image_url: urlData.publicUrl,
+        position: lineup.length + i,
+      });
+    }
+
+    if (inserts.length > 0) {
+      const { error } = await supabase.from("event_lineup").insert(inserts);
+      if (error) toast.error("Failed to add artists");
+      else toast.success(`${inserts.length} artist(s) added to lineup!`);
+    }
+
+    bulkArtists.forEach(a => URL.revokeObjectURL(a.previewUrl));
+    setBulkArtists([]);
+    setBulkDialogOpen(false);
+    setBulkUploading(false);
+  };
+
+  const bulkFileRef = useRef<HTMLInputElement>(null);
+
   if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
