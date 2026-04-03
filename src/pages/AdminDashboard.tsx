@@ -415,10 +415,12 @@ const AdminDashboard = () => {
                           <Input value={lineupForm.stage} onChange={e => setLineupForm(f => ({ ...f, stage: e.target.value }))} placeholder="Main Stage" />
                         </div>
                       </div>
-                      <div>
-                        <Label>Artist Image URL</Label>
-                        <Input value={lineupForm.image_url} onChange={e => setLineupForm(f => ({ ...f, image_url: e.target.value }))} />
-                      </div>
+                    <ImageUpload
+                      value={lineupForm.image_url}
+                      onChange={(url) => setLineupForm(f => ({ ...f, image_url: url }))}
+                      label="Artist Photo"
+                      folder="admin/artists"
+                    />
                       <div className="flex items-center gap-2">
                         <Switch checked={lineupForm.is_headliner} onCheckedChange={v => setLineupForm(f => ({ ...f, is_headliner: v }))} />
                         <Label>Headliner</Label>
