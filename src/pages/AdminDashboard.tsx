@@ -72,6 +72,9 @@ const AdminDashboard = () => {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [lineupForm, setLineupForm] = useState({ artist_name: "", set_time: "", stage: "", is_headliner: false, image_url: "" });
   const [lineupDialogOpen, setLineupDialogOpen] = useState(false);
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkArtists, setBulkArtists] = useState<{ file: File; name: string; stage: string; set_time: string; is_headliner: boolean; previewUrl: string }[]>([]);
+  const [bulkUploading, setBulkUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
