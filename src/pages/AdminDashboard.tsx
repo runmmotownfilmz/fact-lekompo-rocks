@@ -22,6 +22,8 @@ import {
   Star, Users, Music, Eye, EyeOff, Loader2, Shield, Upload, X
 } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
+import TicketTierManager from "@/components/admin/TicketTierManager";
+import TicketCheckIn from "@/components/admin/TicketCheckIn";
 
 interface Event {
   id: string;
