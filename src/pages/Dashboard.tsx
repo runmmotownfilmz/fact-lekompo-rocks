@@ -199,6 +199,7 @@ const Dashboard = () => {
             <TabsList className="mb-6 bg-muted/50">
               <TabsTrigger value="uploads"><Music className="w-3.5 h-3.5 mr-1.5" />Uploads</TabsTrigger>
               <TabsTrigger value="projects"><FolderKanban className="w-3.5 h-3.5 mr-1.5" />Projects</TabsTrigger>
+              <TabsTrigger value="tickets"><Ticket className="w-3.5 h-3.5 mr-1.5" />My Tickets</TabsTrigger>
             </TabsList>
 
             {/* UPLOADS TAB */}
