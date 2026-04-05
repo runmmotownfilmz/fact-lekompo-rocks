@@ -309,6 +309,14 @@ const AdminDashboard = () => {
               <Users className="w-4 h-4 mr-2" />
               Lineup
             </TabsTrigger>
+            <TabsTrigger value="tickets">
+              <Ticket className="w-4 h-4 mr-2" />
+              Tickets
+            </TabsTrigger>
+            <TabsTrigger value="checkin">
+              <Shield className="w-4 h-4 mr-2" />
+              Check-In
+            </TabsTrigger>
           </TabsList>
 
           {/* EVENTS TAB */}
