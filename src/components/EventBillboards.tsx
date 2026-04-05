@@ -69,6 +69,7 @@ const EventBillboards = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
   const [isAnimating, setIsAnimating] = useState(false);
+  const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
