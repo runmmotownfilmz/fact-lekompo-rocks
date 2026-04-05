@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3, FolderKanban } from "lucide-react";
+import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3, FolderKanban, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
