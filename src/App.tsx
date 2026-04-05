@@ -15,6 +15,7 @@ import Playlists from "./pages/Playlists";
 import Dashboard from "./pages/Dashboard";
 import Learn from "./pages/Learn";
 import AdminDashboard from "./pages/AdminDashboard";
+import TicketSuccess from "./pages/TicketSuccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/ticket-success" element={<TicketSuccess />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

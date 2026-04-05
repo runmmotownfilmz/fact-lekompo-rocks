@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3, FolderKanban } from "lucide-react";
+import { Music, Trash2, Loader2, ArrowLeft, Play, Eye, TrendingUp, Disc, BarChart3, FolderKanban, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,7 @@ import Navbar from "@/components/Navbar";
 import ProjectList from "@/components/dashboard/ProjectList";
 import ProjectDetail from "@/components/dashboard/ProjectDetail";
 import ProjectInvitations from "@/components/dashboard/ProjectInvitations";
+import MyTickets from "@/components/MyTickets";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -198,6 +199,7 @@ const Dashboard = () => {
             <TabsList className="mb-6 bg-muted/50">
               <TabsTrigger value="uploads"><Music className="w-3.5 h-3.5 mr-1.5" />Uploads</TabsTrigger>
               <TabsTrigger value="projects"><FolderKanban className="w-3.5 h-3.5 mr-1.5" />Projects</TabsTrigger>
+              <TabsTrigger value="tickets"><Ticket className="w-3.5 h-3.5 mr-1.5" />My Tickets</TabsTrigger>
             </TabsList>
 
             {/* UPLOADS TAB */}
@@ -301,6 +303,11 @@ const Dashboard = () => {
                   onRefresh={fetchProjects}
                 />
               )}
+            </TabsContent>
+
+            {/* TICKETS TAB */}
+            <TabsContent value="tickets">
+              <MyTickets />
             </TabsContent>
           </Tabs>
         </div>

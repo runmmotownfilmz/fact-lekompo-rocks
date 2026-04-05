@@ -22,6 +22,8 @@ import {
   Star, Users, Music, Eye, EyeOff, Loader2, Shield, Upload, X
 } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
+import TicketTierManager from "@/components/admin/TicketTierManager";
+import TicketCheckIn from "@/components/admin/TicketCheckIn";
 
 interface Event {
   id: string;
@@ -306,6 +308,14 @@ const AdminDashboard = () => {
             <TabsTrigger value="lineup">
               <Users className="w-4 h-4 mr-2" />
               Lineup
+            </TabsTrigger>
+            <TabsTrigger value="tickets">
+              <Ticket className="w-4 h-4 mr-2" />
+              Tickets
+            </TabsTrigger>
+            <TabsTrigger value="checkin">
+              <Shield className="w-4 h-4 mr-2" />
+              Check-In
             </TabsTrigger>
           </TabsList>
 
@@ -646,6 +656,34 @@ const AdminDashboard = () => {
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          {/* TICKETS TAB */}
+          <TabsContent value="tickets" className="space-y-6">
+            {selectedEvent ? (
+              <TicketTierManager eventId={selectedEvent.id} eventTitle={selectedEvent.title} />
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">Select an event first to manage ticket tiers.</p>
+            )}
+            {events.length > 1 && (
+              <div className="flex gap-2 items-center">
+                <span className="text-sm text-muted-foreground">Event:</span>
+                <select
+                  className="bg-card border border-border rounded-lg px-3 py-2 text-sm"
+                  value={selectedEventId || ""}
+                  onChange={e => setSelectedEventId(e.target.value)}
+                >
+                  {events.map(e => (
+                    <option key={e.id} value={e.id}>{e.title}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* CHECK-IN TAB */}
+          <TabsContent value="checkin" className="space-y-6">
+            <TicketCheckIn />
           </TabsContent>
         </Tabs>
       </div>

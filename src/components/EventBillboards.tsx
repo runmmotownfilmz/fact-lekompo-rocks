@@ -3,6 +3,7 @@ import { Calendar, MapPin, Ticket, ChevronLeft, ChevronRight } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import TicketPurchaseDialog from "@/components/TicketPurchaseDialog";
 
 interface Event {
   id: string;
@@ -68,6 +69,7 @@ const EventBillboards = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
   const [isAnimating, setIsAnimating] = useState(false);
+  const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -230,7 +232,13 @@ const EventBillboards = () => {
                 <Button
                   variant="hero"
                   size="xl"
-                  onClick={() => event.ticket_url && window.open(event.ticket_url, "_blank")}
+                  onClick={() => {
+                    if (event.id.length >= 10) {
+                      setTicketDialogOpen(true);
+                    } else if (event.ticket_url) {
+                      window.open(event.ticket_url, "_blank");
+                    }
+                  }}
                 >
                   Get Tickets Now
                 </Button>
@@ -240,6 +248,16 @@ const EventBillboards = () => {
               </div>
             </div>
           </div>
+
+          {/* Ticket Purchase Dialog */}
+          {event.id.length >= 10 && (
+            <TicketPurchaseDialog
+              eventId={event.id}
+              eventTitle={event.title}
+              open={ticketDialogOpen}
+              onOpenChange={setTicketDialogOpen}
+            />
+          )}
 
           {/* Navigation Arrows */}
           {events.length > 1 && (
