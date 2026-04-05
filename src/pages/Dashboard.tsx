@@ -304,6 +304,11 @@ const Dashboard = () => {
                 />
               )}
             </TabsContent>
+
+            {/* TICKETS TAB */}
+            <TabsContent value="tickets">
+              <MyTickets />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
