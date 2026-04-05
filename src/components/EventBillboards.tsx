@@ -3,6 +3,7 @@ import { Calendar, MapPin, Ticket, ChevronLeft, ChevronRight } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import TicketPurchaseDialog from "@/components/TicketPurchaseDialog";
 
 interface Event {
   id: string;
