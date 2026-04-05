@@ -12,6 +12,7 @@ import Navbar from "@/components/Navbar";
 import ProjectList from "@/components/dashboard/ProjectList";
 import ProjectDetail from "@/components/dashboard/ProjectDetail";
 import ProjectInvitations from "@/components/dashboard/ProjectInvitations";
+import MyTickets from "@/components/MyTickets";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
