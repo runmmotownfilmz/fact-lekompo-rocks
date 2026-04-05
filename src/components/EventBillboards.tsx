@@ -232,7 +232,13 @@ const EventBillboards = () => {
                 <Button
                   variant="hero"
                   size="xl"
-                  onClick={() => event.ticket_url && window.open(event.ticket_url, "_blank")}
+                  onClick={() => {
+                    if (event.id.length >= 10) {
+                      setTicketDialogOpen(true);
+                    } else if (event.ticket_url) {
+                      window.open(event.ticket_url, "_blank");
+                    }
+                  }}
                 >
                   Get Tickets Now
                 </Button>
@@ -242,6 +248,16 @@ const EventBillboards = () => {
               </div>
             </div>
           </div>
+
+          {/* Ticket Purchase Dialog */}
+          {event.id.length >= 10 && (
+            <TicketPurchaseDialog
+              eventId={event.id}
+              eventTitle={event.title}
+              open={ticketDialogOpen}
+              onOpenChange={setTicketDialogOpen}
+            />
+          )}
 
           {/* Navigation Arrows */}
           {events.length > 1 && (
