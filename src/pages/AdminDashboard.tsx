@@ -24,6 +24,7 @@ import {
 import ImageUpload from "@/components/ImageUpload";
 import TicketTierManager from "@/components/admin/TicketTierManager";
 import TicketCheckIn from "@/components/admin/TicketCheckIn";
+import TicketAnalytics from "@/components/admin/TicketAnalytics";
 
 interface Event {
   id: string;
