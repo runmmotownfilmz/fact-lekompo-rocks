@@ -314,7 +314,14 @@ const AdminDashboard = () => {
               <Ticket className="w-4 h-4 mr-2" />
               Tickets
             </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </TabsTrigger>
             <TabsTrigger value="checkin">
+              <Shield className="w-4 h-4 mr-2" />
+              Check-In
+            </TabsTrigger>
               <Shield className="w-4 h-4 mr-2" />
               Check-In
             </TabsTrigger>
