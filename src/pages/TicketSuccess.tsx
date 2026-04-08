@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { Loader2, CheckCircle, XCircle, Ticket } from "lucide-react";
 const TicketSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [ticketCount, setTicketCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
@@ -25,25 +23,52 @@ const TicketSuccess = () => {
       return;
     }
 
-    if (!user) return;
-
-    const verify = async () => {
-      const { data, error } = await supabase.functions.invoke("verify-ticket-payment", {
-        body: { order_id: orderId, session_id: sessionId },
-      });
-
-      if (error || data?.error) {
-        setStatus("error");
-        setErrorMsg(data?.error || "Failed to verify payment");
+    // Wait for auth session to be restored before calling verify
+    const runVerify = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Listen for auth state change (session restore)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (_event, sess) => {
+            if (sess) {
+              subscription.unsubscribe();
+              await verify(orderId, sessionId);
+            }
+          }
+        );
+        // Timeout after 10s
+        setTimeout(() => {
+          subscription.unsubscribe();
+          setStatus("error");
+          setErrorMsg("Please log in to verify your tickets.");
+        }, 10000);
         return;
       }
-
-      setStatus("success");
-      setTicketCount(data.ticket_count || 0);
+      await verify(orderId, sessionId);
     };
 
-    verify();
-  }, [user, searchParams]);
+    const verify = async (orderId: string, sessionId: string) => {
+      try {
+        const { data, error } = await supabase.functions.invoke("verify-ticket-payment", {
+          body: { order_id: orderId, session_id: sessionId },
+        });
+
+        if (error || data?.error) {
+          setStatus("error");
+          setErrorMsg(data?.error || "Failed to verify payment");
+          return;
+        }
+
+        setStatus("success");
+        setTicketCount(data.ticket_count || data.already_verified ? 1 : 0);
+      } catch (e) {
+        setStatus("error");
+        setErrorMsg("Failed to verify payment. Please try again.");
+      }
+    };
+
+    runVerify();
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,9 +111,14 @@ const TicketSuccess = () => {
               </div>
               <h2 className="text-3xl font-bold">Something Went Wrong</h2>
               <p className="text-muted-foreground">{errorMsg}</p>
-              <Button variant="outline" onClick={() => navigate("/")}>
-                Back to Home
-              </Button>
+              <div className="flex flex-col gap-3">
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Try Again
+                </Button>
+                <Button variant="outline" onClick={() => navigate("/")}>
+                  Back to Home
+                </Button>
+              </div>
             </div>
           )}
         </div>
