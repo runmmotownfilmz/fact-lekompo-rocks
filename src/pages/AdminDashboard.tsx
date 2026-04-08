@@ -19,11 +19,12 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import {
   Plus, Pencil, Trash2, Calendar, MapPin, Ticket,
-  Star, Users, Music, Eye, EyeOff, Loader2, Shield, Upload, X
+  Star, Users, Music, Eye, EyeOff, Loader2, Shield, Upload, X, BarChart3
 } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 import TicketTierManager from "@/components/admin/TicketTierManager";
 import TicketCheckIn from "@/components/admin/TicketCheckIn";
+import TicketAnalytics from "@/components/admin/TicketAnalytics";
 
 interface Event {
   id: string;
@@ -312,6 +313,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="tickets">
               <Ticket className="w-4 h-4 mr-2" />
               Tickets
+            </TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="checkin">
               <Shield className="w-4 h-4 mr-2" />
@@ -679,6 +684,11 @@ const AdminDashboard = () => {
                 </select>
               </div>
             )}
+          </TabsContent>
+
+          {/* ANALYTICS TAB */}
+          <TabsContent value="analytics" className="space-y-6">
+            <TicketAnalytics />
           </TabsContent>
 
           {/* CHECK-IN TAB */}
