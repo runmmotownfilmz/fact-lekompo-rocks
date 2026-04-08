@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import {
   Plus, Pencil, Trash2, Calendar, MapPin, Ticket,
-  Star, Users, Music, Eye, EyeOff, Loader2, Shield, Upload, X
+  Star, Users, Music, Eye, EyeOff, Loader2, Shield, Upload, X, BarChart3
 } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 import TicketTierManager from "@/components/admin/TicketTierManager";
