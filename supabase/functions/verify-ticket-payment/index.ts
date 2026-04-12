@@ -117,6 +117,37 @@ serve(async (req) => {
       })
       .eq("id", order.id);
 
+    // Send confirmation email with ticket QR codes (gracefully fails if email infra not set up yet)
+    try {
+      const ticketDetails = tickets.map((t: any) => {
+        const tier = tierData?.find((td: any) => td.id === t.tier_id);
+        return {
+          qr_code: t.qr_code,
+          tier_name: tier?.name || "General",
+          price: tier?.price || 0,
+          currency: tier?.currency || "ZAR",
+        };
+      });
+
+      await supabaseClient.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "ticket-confirmation",
+          recipientEmail: user.email,
+          idempotencyKey: `ticket-confirm-${order.id}`,
+          templateData: {
+            name: user.user_metadata?.display_name || user.email,
+            eventTitle: event?.title || "Event",
+            tickets: ticketDetails,
+            orderTotal: order.total_amount,
+            currency: order.currency,
+          },
+        },
+      });
+    } catch (emailErr) {
+      // Email sending is non-blocking — tickets are already created
+      console.warn("Email confirmation skipped (infra not ready):", emailErr);
+    }
+
     return new Response(JSON.stringify({ success: true, ticket_count: tickets.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
