@@ -50,7 +50,13 @@ serve(async (req) => {
       });
     }
 
-    // Verify with Stripe
+    // Fetch event details for email
+    const { data: event } = await supabaseClient
+      .from("events")
+      .select("id, title")
+      .eq("id", order.event_id)
+      .single();
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
@@ -65,7 +71,13 @@ serve(async (req) => {
     if (!tiersJson) throw new Error("No tier data in session");
     const tiers = JSON.parse(tiersJson);
 
-    // Create individual tickets and update sold counts
+    // Fetch tier details for email
+    const tierIds = tiers.map((t: any) => t.tier_id);
+    const { data: tierData } = await supabaseClient
+      .from("ticket_tiers")
+      .select("*")
+      .in("id", tierIds);
+
     const tickets: any[] = [];
     for (const item of tiers) {
       for (let i = 0; i < item.quantity; i++) {
@@ -116,6 +128,37 @@ serve(async (req) => {
         stripe_payment_intent_id: session.payment_intent as string,
       })
       .eq("id", order.id);
+
+    // Send confirmation email with ticket QR codes (gracefully fails if email infra not set up yet)
+    try {
+      const ticketDetails = tickets.map((t: any) => {
+        const tier = tierData?.find((td: any) => td.id === t.tier_id);
+        return {
+          qr_code: t.qr_code,
+          tier_name: tier?.name || "General",
+          price: tier?.price || 0,
+          currency: tier?.currency || "ZAR",
+        };
+      });
+
+      await supabaseClient.functions.invoke("send-transactional-email", {
+        body: {
+          templateName: "ticket-confirmation",
+          recipientEmail: user.email,
+          idempotencyKey: `ticket-confirm-${order.id}`,
+          templateData: {
+            name: user.user_metadata?.display_name || user.email,
+            eventTitle: event?.title || "Event",
+            tickets: ticketDetails,
+            orderTotal: order.total_amount,
+            currency: order.currency,
+          },
+        },
+      });
+    } catch (emailErr) {
+      // Email sending is non-blocking — tickets are already created
+      console.warn("Email confirmation skipped (infra not ready):", emailErr);
+    }
 
     return new Response(JSON.stringify({ success: true, ticket_count: tickets.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
