@@ -71,7 +71,13 @@ serve(async (req) => {
     if (!tiersJson) throw new Error("No tier data in session");
     const tiers = JSON.parse(tiersJson);
 
-    // Create individual tickets and update sold counts
+    // Fetch tier details for email
+    const tierIds = tiers.map((t: any) => t.tier_id);
+    const { data: tierData } = await supabaseClient
+      .from("ticket_tiers")
+      .select("*")
+      .in("id", tierIds);
+
     const tickets: any[] = [];
     for (const item of tiers) {
       for (let i = 0; i < item.quantity; i++) {
