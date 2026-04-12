@@ -50,7 +50,13 @@ serve(async (req) => {
       });
     }
 
-    // Verify with Stripe
+    // Fetch event details for email
+    const { data: event } = await supabaseClient
+      .from("events")
+      .select("id, title")
+      .eq("id", order.event_id)
+      .single();
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
