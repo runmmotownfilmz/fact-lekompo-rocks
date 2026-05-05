@@ -5,24 +5,65 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { token } = await req.json();
+    const body = await req.json();
+    const { token, action } = body;
     if (!token || typeof token !== "string") {
       return new Response(JSON.stringify({ error: "Missing token" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(supabaseUrl, serviceKey);
 
+    // Fetch transfer + related ticket/event/tier/sender
+    const { data: transfer, error: tErr } = await admin
+      .from("ticket_transfers")
+      .select(`
+        id, status, from_user_id, ticket_id,
+        tickets(events(title, event_date, venue), ticket_tiers(name, price))
+      `)
+      .eq("claim_token", token)
+      .maybeSingle();
+
+    if (tErr || !transfer) {
+      return new Response(JSON.stringify({ error: "Invalid transfer link" }), {
+        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: senderProfile } = await admin
+      .from("profiles")
+      .select("display_name, username")
+      .eq("user_id", transfer.from_user_id)
+      .maybeSingle();
+
+    const t: any = transfer;
+    const previewPayload = {
+      status: t.status,
+      event_title: t.tickets?.events?.title || "Event",
+      event_date: t.tickets?.events?.event_date || null,
+      event_venue: t.tickets?.events?.venue || null,
+      tier_name: t.tickets?.ticket_tiers?.name || "General",
+      tier_price: Number(t.tickets?.ticket_tiers?.price || 0),
+      from_name: senderProfile?.display_name || senderProfile?.username || null,
+    };
+
+    if (action === "preview") {
+      return new Response(JSON.stringify({ preview: previewPayload }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Default action: claim → requires auth
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Sign in required" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -34,19 +75,6 @@ Deno.serve(async (req) => {
     }
     const user = userData.user;
 
-    const admin = createClient(supabaseUrl, serviceKey);
-
-    const { data: transfer, error: tErr } = await admin
-      .from("ticket_transfers")
-      .select("*")
-      .eq("claim_token", token)
-      .maybeSingle();
-
-    if (tErr || !transfer) {
-      return new Response(JSON.stringify({ error: "Invalid transfer link" }), {
-        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
     if (transfer.status !== "pending") {
       return new Response(JSON.stringify({ error: `Transfer already ${transfer.status}` }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -58,7 +86,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Reassign ticket and mark transfer claimed
     const { error: upErr } = await admin
       .from("tickets")
       .update({ user_id: user.id, attendee_email: user.email ?? null })
