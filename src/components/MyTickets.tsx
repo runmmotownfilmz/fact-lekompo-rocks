@@ -45,22 +45,6 @@ const MyTickets = () => {
     if (!user) return;
     fetchTickets();
   }, [user]);
-    if (!user) return;
-    const fetchTickets = async () => {
-      const { data } = await supabase
-        .from("tickets")
-        .select(`
-          id, qr_code, attendee_name, is_checked_in, checked_in_at, created_at,
-          events(title, event_date, venue),
-          ticket_tiers(name, price)
-        `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      setTickets((data as any) || []);
-      setLoading(false);
-    };
-    fetchTickets();
-  }, [user]);
 
   if (loading) {
     return (
