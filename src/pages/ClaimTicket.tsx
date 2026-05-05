@@ -48,32 +48,13 @@ const ClaimTicket = () => {
       return;
     }
     const load = async () => {
-      const { data, error } = await supabase
-        .from("ticket_transfers")
-        .select(`
-          status,
-          tickets(
-            events(title, event_date, venue),
-            ticket_tiers(name, price)
-          ),
-          profiles:from_user_id(display_name, username)
-        `)
-        .eq("claim_token", token)
-        .maybeSingle();
-
-      if (error || !data) {
-        setPreviewError("Invalid or expired transfer link.");
+      const { data, error } = await supabase.functions.invoke("claim-ticket-transfer", {
+        body: { token, action: "preview" },
+      });
+      if (error || data?.error || !data?.preview) {
+        setPreviewError(data?.error || "Invalid or expired transfer link.");
       } else {
-        const t: any = data;
-        setPreview({
-          status: t.status,
-          event_title: t.tickets?.events?.title || "Event",
-          event_date: t.tickets?.events?.event_date || null,
-          event_venue: t.tickets?.events?.venue || null,
-          tier_name: t.tickets?.ticket_tiers?.name || "General",
-          tier_price: t.tickets?.ticket_tiers?.price || 0,
-          from_name: t.profiles?.display_name || t.profiles?.username || null,
-        });
+        setPreview(data.preview);
       }
       setLoadingPreview(false);
     };
