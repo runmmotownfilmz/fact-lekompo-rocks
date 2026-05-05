@@ -16,6 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import Learn from "./pages/Learn";
 import AdminDashboard from "./pages/AdminDashboard";
 import TicketSuccess from "./pages/TicketSuccess";
+import ClaimTicket from "./pages/ClaimTicket";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/learn" element={<Learn />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/ticket-success" element={<TicketSuccess />} />
+            <Route path="/claim-ticket" element={<ClaimTicket />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
