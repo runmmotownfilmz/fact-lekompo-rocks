@@ -3,9 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Calendar, MapPin, Ticket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Calendar, MapPin, Ticket, Send } from "lucide-react";
 import { format } from "date-fns";
 import { QRCodeSVG } from "qrcode.react";
+import TicketTransferDialog from "./TicketTransferDialog";
 
 interface TicketData {
   id: string;
