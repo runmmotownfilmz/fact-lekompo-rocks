@@ -3,9 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Calendar, MapPin, Ticket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Calendar, MapPin, Ticket, Send } from "lucide-react";
 import { format } from "date-fns";
 import { QRCodeSVG } from "qrcode.react";
+import TicketTransferDialog from "./TicketTransferDialog";
 
 interface TicketData {
   id: string;
@@ -22,22 +24,25 @@ const MyTickets = () => {
   const { user } = useAuth();
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [transferTicket, setTransferTicket] = useState<TicketData | null>(null);
+
+  const fetchTickets = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("tickets")
+      .select(`
+        id, qr_code, attendee_name, is_checked_in, checked_in_at, created_at,
+        events(title, event_date, venue),
+        ticket_tiers(name, price)
+      `)
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    setTickets((data as any) || []);
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (!user) return;
-    const fetchTickets = async () => {
-      const { data } = await supabase
-        .from("tickets")
-        .select(`
-          id, qr_code, attendee_name, is_checked_in, checked_in_at, created_at,
-          events(title, event_date, venue),
-          ticket_tiers(name, price)
-        `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      setTickets((data as any) || []);
-      setLoading(false);
-    };
     fetchTickets();
   }, [user]);
 
@@ -127,10 +132,30 @@ const MyTickets = () => {
                   Checked in: {format(new Date(ticket.checked_in_at), "MMM d, yyyy HH:mm")}
                 </p>
               )}
+              {!ticket.is_checked_in && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mt-3"
+                  onClick={() => setTransferTicket(ticket)}
+                >
+                  <Send className="w-3.5 h-3.5 mr-2" />
+                  Transfer Ticket
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
       ))}
+      {transferTicket && (
+        <TicketTransferDialog
+          ticketId={transferTicket.id}
+          ticketTitle={(transferTicket.events as any)?.title || "Event"}
+          open={!!transferTicket}
+          onOpenChange={(o) => !o && setTransferTicket(null)}
+          onTransferred={fetchTickets}
+        />
+      )}
     </div>
   );
 };

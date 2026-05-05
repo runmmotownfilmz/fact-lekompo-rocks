@@ -689,6 +689,45 @@ export type Database = {
           },
         ]
       }
+      ticket_transfers: {
+        Row: {
+          cancelled_at: string | null
+          claim_token: string
+          claimed_at: string | null
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string
+          ticket_id: string
+          to_email: string
+          to_user_id: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          claim_token?: string
+          claimed_at?: string | null
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string
+          ticket_id: string
+          to_email: string
+          to_user_id?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          claim_token?: string
+          claimed_at?: string | null
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string
+          ticket_id?: string
+          to_email?: string
+          to_user_id?: string | null
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           attendee_email: string | null
