@@ -132,10 +132,30 @@ const MyTickets = () => {
                   Checked in: {format(new Date(ticket.checked_in_at), "MMM d, yyyy HH:mm")}
                 </p>
               )}
+              {!ticket.is_checked_in && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mt-3"
+                  onClick={() => setTransferTicket(ticket)}
+                >
+                  <Send className="w-3.5 h-3.5 mr-2" />
+                  Transfer Ticket
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
       ))}
+      {transferTicket && (
+        <TicketTransferDialog
+          ticketId={transferTicket.id}
+          ticketTitle={(transferTicket.events as any)?.title || "Event"}
+          open={!!transferTicket}
+          onOpenChange={(o) => !o && setTransferTicket(null)}
+          onTransferred={fetchTickets}
+        />
+      )}
     </div>
   );
 };
