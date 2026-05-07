@@ -30,7 +30,7 @@ const TicketPurchaseDialog = ({ eventId, eventTitle, open, onOpenChange }: Props
   const navigate = useNavigate();
   const [tiers, setTiers] = useState<TicketTier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState(false);
+  const [purchasing, setPurchasing] = useState<null | "stripe" | "payfast">(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
