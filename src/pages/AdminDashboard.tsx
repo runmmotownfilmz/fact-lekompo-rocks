@@ -690,6 +690,7 @@ const AdminDashboard = () => {
           {/* ANALYTICS TAB */}
           <TabsContent value="analytics" className="space-y-6">
             <TicketAnalytics />
+            <PayFastSandboxTest />
           </TabsContent>
 
           {/* CHECK-IN TAB */}
