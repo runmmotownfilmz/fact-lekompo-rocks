@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import { Md5 } from "https://deno.land/std@0.190.0/hash/md5.ts";
+import CryptoJS from "npm:crypto-js@4.2.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,9 +25,7 @@ function buildSignature(data: Record<string, string>, passphrase: string, skipSi
   if (passphrase) {
     queryString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`;
   }
-  const md5 = new Md5();
-  md5.update(queryString);
-  return md5.toString();
+  return CryptoJS.MD5(queryString).toString();
 }
 
 serve(async (req) => {

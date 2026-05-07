@@ -1,14 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import CryptoJS from "npm:crypto-js@4.2.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// PayFast signature generation
-async function generateSignature(data: Record<string, string>, passphrase: string): Promise<string> {
-  // Build query string in insertion order, URL-encoded with + for spaces
+function generateSignature(data: Record<string, string>, passphrase: string): string {
   const parts: string[] = [];
   for (const [key, value] of Object.entries(data)) {
     if (value === "" || value === null || value === undefined) continue;
@@ -18,21 +17,7 @@ async function generateSignature(data: Record<string, string>, passphrase: strin
   if (passphrase) {
     queryString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`;
   }
-  // MD5 hash
-  const buffer = new TextEncoder().encode(queryString);
-  const hashBuffer = await crypto.subtle.digest("MD5", buffer).catch(async () => {
-    // Deno doesn't have MD5 in subtle — fallback
-    const { Md5 } = await import("https://deno.land/std@0.190.0/hash/md5.ts");
-    const md5 = new Md5();
-    md5.update(queryString);
-    return md5.digest();
-  });
-  if (hashBuffer instanceof ArrayBuffer) {
-    return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-  }
-  return hashBuffer as unknown as string;
+  return CryptoJS.MD5(queryString).toString();
 }
 
 serve(async (req) => {
