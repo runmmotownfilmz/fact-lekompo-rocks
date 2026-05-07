@@ -62,33 +62,59 @@ const TicketPurchaseDialog = ({ eventId, eventTitle, open, onOpenChange }: Props
   const total = tiers.reduce((sum, tier) => sum + tier.price * (quantities[tier.id] || 0), 0);
   const hasSelection = Object.values(quantities).some(q => q > 0);
 
-  const handlePurchase = async () => {
+  const handlePurchase = async (provider: "stripe" | "payfast") => {
     if (!user) {
       toast.error("Please sign in to purchase tickets");
       navigate("/auth");
       return;
     }
 
-    setPurchasing(true);
+    setPurchasing(provider);
     const selectedTiers = Object.entries(quantities)
       .filter(([_, qty]) => qty > 0)
       .map(([tier_id, quantity]) => ({ tier_id, quantity }));
 
-    const { data, error } = await supabase.functions.invoke("create-ticket-checkout", {
-      body: { event_id: eventId, tiers: selectedTiers },
-    });
-
-    if (error || data?.error) {
-      toast.error(data?.error || "Failed to create checkout");
-      setPurchasing(false);
-      return;
+    if (provider === "stripe") {
+      const { data, error } = await supabase.functions.invoke("create-ticket-checkout", {
+        body: { event_id: eventId, tiers: selectedTiers },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || "Failed to create checkout");
+        setPurchasing(null);
+        return;
+      }
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        onOpenChange(false);
+      }
+    } else {
+      const { data, error } = await supabase.functions.invoke("create-payfast-checkout", {
+        body: { event_id: eventId, tiers: selectedTiers },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || "Failed to create checkout");
+        setPurchasing(null);
+        return;
+      }
+      if (data?.payfast_url && data?.fields) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.payfast_url;
+        form.target = "_blank";
+        Object.entries(data.fields as Record<string, string>).forEach(([k, v]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = k;
+          input.value = String(v);
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+        onOpenChange(false);
+      }
     }
-
-    if (data?.url) {
-      window.open(data.url, "_blank");
-      onOpenChange(false);
-    }
-    setPurchasing(false);
+    setPurchasing(null);
   };
 
   return (
