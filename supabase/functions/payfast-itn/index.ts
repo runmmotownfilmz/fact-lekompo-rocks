@@ -25,9 +25,7 @@ function buildSignature(data: Record<string, string>, passphrase: string, skipSi
   if (passphrase) {
     queryString += `&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`;
   }
-  const md5 = new Md5();
-  md5.update(queryString);
-  return md5.toString();
+  return CryptoJS.MD5(queryString).toString();
 }
 
 serve(async (req) => {
