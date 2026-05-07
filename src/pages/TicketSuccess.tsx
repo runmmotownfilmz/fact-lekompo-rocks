@@ -16,18 +16,55 @@ const TicketSuccess = () => {
   useEffect(() => {
     const orderId = searchParams.get("order_id");
     const sessionId = searchParams.get("session_id");
+    const provider = searchParams.get("provider");
 
-    if (!orderId || !sessionId) {
+    if (!orderId) {
       setStatus("error");
       setErrorMsg("Invalid ticket confirmation link.");
       return;
     }
 
-    // Wait for auth session to be restored before calling verify
+    // PayFast: webhook (ITN) confirms the payment. Poll the order until status=paid.
+    if (provider === "payfast") {
+      let attempts = 0;
+      const pollPayfast = async () => {
+        attempts++;
+        const { data: order } = await supabase
+          .from("ticket_orders")
+          .select("status")
+          .eq("id", orderId)
+          .maybeSingle();
+
+        if (order?.status === "paid") {
+          const { count } = await supabase
+            .from("tickets")
+            .select("*", { count: "exact", head: true })
+            .eq("order_id", orderId);
+          setTicketCount(count || 1);
+          setStatus("success");
+          return;
+        }
+        if (attempts > 20) {
+          setStatus("error");
+          setErrorMsg("Payment is taking longer than expected. Please check 'My Tickets' shortly — your ticket will appear once PayFast confirms.");
+          return;
+        }
+        setTimeout(pollPayfast, 2000);
+      };
+      pollPayfast();
+      return;
+    }
+
+    // Stripe flow (existing)
+    if (!sessionId) {
+      setStatus("error");
+      setErrorMsg("Invalid ticket confirmation link.");
+      return;
+    }
+
     const runVerify = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Listen for auth state change (session restore)
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (_event, sess) => {
             if (sess) {
@@ -36,7 +73,6 @@ const TicketSuccess = () => {
             }
           }
         );
-        // Timeout after 10s
         setTimeout(() => {
           subscription.unsubscribe();
           setStatus("error");
