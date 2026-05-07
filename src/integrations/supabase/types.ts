@@ -594,6 +594,8 @@ export type Database = {
           customer_name: string | null
           event_id: string
           id: string
+          payfast_payment_id: string | null
+          payment_provider: string
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
@@ -608,6 +610,8 @@ export type Database = {
           customer_name?: string | null
           event_id: string
           id?: string
+          payfast_payment_id?: string | null
+          payment_provider?: string
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
@@ -622,6 +626,8 @@ export type Database = {
           customer_name?: string | null
           event_id?: string
           id?: string
+          payfast_payment_id?: string | null
+          payment_provider?: string
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null

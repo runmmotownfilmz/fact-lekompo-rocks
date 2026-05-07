@@ -30,7 +30,7 @@ const TicketPurchaseDialog = ({ eventId, eventTitle, open, onOpenChange }: Props
   const navigate = useNavigate();
   const [tiers, setTiers] = useState<TicketTier[]>([]);
   const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState(false);
+  const [purchasing, setPurchasing] = useState<null | "stripe" | "payfast">(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -62,33 +62,59 @@ const TicketPurchaseDialog = ({ eventId, eventTitle, open, onOpenChange }: Props
   const total = tiers.reduce((sum, tier) => sum + tier.price * (quantities[tier.id] || 0), 0);
   const hasSelection = Object.values(quantities).some(q => q > 0);
 
-  const handlePurchase = async () => {
+  const handlePurchase = async (provider: "stripe" | "payfast") => {
     if (!user) {
       toast.error("Please sign in to purchase tickets");
       navigate("/auth");
       return;
     }
 
-    setPurchasing(true);
+    setPurchasing(provider);
     const selectedTiers = Object.entries(quantities)
       .filter(([_, qty]) => qty > 0)
       .map(([tier_id, quantity]) => ({ tier_id, quantity }));
 
-    const { data, error } = await supabase.functions.invoke("create-ticket-checkout", {
-      body: { event_id: eventId, tiers: selectedTiers },
-    });
-
-    if (error || data?.error) {
-      toast.error(data?.error || "Failed to create checkout");
-      setPurchasing(false);
-      return;
+    if (provider === "stripe") {
+      const { data, error } = await supabase.functions.invoke("create-ticket-checkout", {
+        body: { event_id: eventId, tiers: selectedTiers },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || "Failed to create checkout");
+        setPurchasing(null);
+        return;
+      }
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        onOpenChange(false);
+      }
+    } else {
+      const { data, error } = await supabase.functions.invoke("create-payfast-checkout", {
+        body: { event_id: eventId, tiers: selectedTiers },
+      });
+      if (error || data?.error) {
+        toast.error(data?.error || "Failed to create checkout");
+        setPurchasing(null);
+        return;
+      }
+      if (data?.payfast_url && data?.fields) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.payfast_url;
+        form.target = "_blank";
+        Object.entries(data.fields as Record<string, string>).forEach(([k, v]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = k;
+          input.value = String(v);
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+        onOpenChange(false);
+      }
     }
-
-    if (data?.url) {
-      window.open(data.url, "_blank");
-      onOpenChange(false);
-    }
-    setPurchasing(false);
+    setPurchasing(null);
   };
 
   return (
@@ -177,20 +203,39 @@ const TicketPurchaseDialog = ({ eventId, eventTitle, open, onOpenChange }: Props
                 <span className="text-lg font-semibold">Total</span>
                 <span className="text-2xl font-bold text-primary">R{total.toFixed(0)}</span>
               </div>
-              <Button
-                variant="hero"
-                size="xl"
-                className="w-full"
-                disabled={!hasSelection || purchasing}
-                onClick={handlePurchase}
-              >
-                {purchasing ? (
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                ) : (
-                  <Ticket className="w-5 h-5 mr-2" />
-                )}
-                {purchasing ? "Processing..." : "Checkout with Stripe"}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  variant="hero"
+                  size="xl"
+                  className="w-full"
+                  disabled={!hasSelection || purchasing !== null}
+                  onClick={() => handlePurchase("stripe")}
+                >
+                  {purchasing === "stripe" ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Ticket className="w-5 h-5 mr-2" />
+                  )}
+                  {purchasing === "stripe" ? "Processing..." : "Pay with Card (Stripe)"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="xl"
+                  className="w-full"
+                  disabled={!hasSelection || purchasing !== null}
+                  onClick={() => handlePurchase("payfast")}
+                >
+                  {purchasing === "payfast" ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Ticket className="w-5 h-5 mr-2" />
+                  )}
+                  {purchasing === "payfast" ? "Processing..." : "Pay with EFT / Card (PayFast)"}
+                </Button>
+                <p className="text-xs text-center text-muted-foreground pt-1">
+                  PayFast supports instant EFT from FNB, ABSA, Standard Bank, Nedbank, Capitec & more.
+                </p>
+              </div>
             </div>
           </div>
         )}
