@@ -1,1 +1,4 @@
 project_id = "tfddrqjwvfnemowhxeof"
+
+[functions.payfast-itn]
+verify_jwt = false
