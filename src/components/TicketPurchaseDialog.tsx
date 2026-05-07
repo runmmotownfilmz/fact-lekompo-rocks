@@ -203,20 +203,39 @@ const TicketPurchaseDialog = ({ eventId, eventTitle, open, onOpenChange }: Props
                 <span className="text-lg font-semibold">Total</span>
                 <span className="text-2xl font-bold text-primary">R{total.toFixed(0)}</span>
               </div>
-              <Button
-                variant="hero"
-                size="xl"
-                className="w-full"
-                disabled={!hasSelection || purchasing}
-                onClick={handlePurchase}
-              >
-                {purchasing ? (
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                ) : (
-                  <Ticket className="w-5 h-5 mr-2" />
-                )}
-                {purchasing ? "Processing..." : "Checkout with Stripe"}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  variant="hero"
+                  size="xl"
+                  className="w-full"
+                  disabled={!hasSelection || purchasing !== null}
+                  onClick={() => handlePurchase("stripe")}
+                >
+                  {purchasing === "stripe" ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Ticket className="w-5 h-5 mr-2" />
+                  )}
+                  {purchasing === "stripe" ? "Processing..." : "Pay with Card (Stripe)"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="xl"
+                  className="w-full"
+                  disabled={!hasSelection || purchasing !== null}
+                  onClick={() => handlePurchase("payfast")}
+                >
+                  {purchasing === "payfast" ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
+                    <Ticket className="w-5 h-5 mr-2" />
+                  )}
+                  {purchasing === "payfast" ? "Processing..." : "Pay with EFT / Card (PayFast)"}
+                </Button>
+                <p className="text-xs text-center text-muted-foreground pt-1">
+                  PayFast supports instant EFT from FNB, ABSA, Standard Bank, Nedbank, Capitec & more.
+                </p>
+              </div>
             </div>
           </div>
         )}
