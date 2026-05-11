@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
+import AudioPlayer, { Track } from "@/components/AudioPlayer";
 
 interface DiscoverTrack {
   id: string;
@@ -38,6 +39,8 @@ const Discover = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"trending" | "new" | "top" | "artists">("trending");
   const [selectedGenre, setSelectedGenre] = useState("All");
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [artistNames, setArtistNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,7 +60,24 @@ const Discover = () => {
           .limit(20),
       ]);
 
-      if (tracksRes.data) setTracks(tracksRes.data);
+      if (tracksRes.data) {
+        setTracks(tracksRes.data);
+        // Fetch artist display names for tracks
+        const userIds = [...new Set(tracksRes.data.map((t) => t.user_id))];
+        if (userIds.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("user_id, display_name, username")
+            .in("user_id", userIds);
+          if (profs) {
+            const map: Record<string, string> = {};
+            profs.forEach((p) => {
+              map[p.user_id] = p.display_name || p.username || "Unknown Artist";
+            });
+            setArtistNames(map);
+          }
+        }
+      }
       if (artistsRes.data) setArtists(artistsRes.data);
       setLoading(false);
     };
@@ -194,10 +214,28 @@ const Discover = () => {
               {filteredTracks.map((track, i) => (
                 <div
                   key={track.id}
-                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-card transition-colors group"
+                  onClick={() => {
+                    if (!track.file_url) return;
+                    setCurrentTrack({
+                      id: track.id,
+                      title: track.title,
+                      artist: artistNames[track.user_id] || "Unknown Artist",
+                      audioUrl: track.file_url,
+                      coverUrl: track.cover_image_url || undefined,
+                    });
+                    // increment plays count fire-and-forget
+                    supabase
+                      .from("uploads")
+                      .update({ plays_count: (track.plays_count || 0) + 1 })
+                      .eq("id", track.id)
+                      .then(() => {});
+                  }}
+                  className={`flex items-center gap-4 p-3 rounded-lg hover:bg-card transition-colors group cursor-pointer ${
+                    currentTrack?.id === track.id ? "bg-primary/10" : ""
+                  }`}
                 >
                   <span className="w-8 text-center text-sm text-muted-foreground font-medium">{i + 1}</span>
-                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
                     {track.cover_image_url ? (
                       <img src={track.cover_image_url} alt={track.title} className="w-full h-full object-cover" />
                     ) : (
@@ -205,25 +243,30 @@ const Discover = () => {
                         <Music className="w-5 h-5 text-muted-foreground" />
                       </div>
                     )}
+                    {track.file_url && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play className="w-5 h-5 text-white fill-white" />
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{track.title}</p>
-                    <p className="text-xs text-muted-foreground capitalize">
-                      {track.genre || track.type}
+                    <p className={`font-medium truncate ${currentTrack?.id === track.id ? "text-primary" : ""}`}>{track.title}</p>
+                    <p className="text-xs text-muted-foreground capitalize truncate">
+                      {artistNames[track.user_id] || "Unknown Artist"} • {track.genre || track.type}
                       {activeTab === "new" && ` • ${new Date(track.created_at).toLocaleDateString()}`}
                     </p>
                   </div>
                   <span className="text-sm text-muted-foreground hidden md:block">
                     {formatPlays(track.plays_count)} plays
                   </span>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Heart className="w-4 h-4" />
                   </Button>
-                  {track.file_url && (
-                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Play className="w-4 h-4" />
-                    </Button>
-                  )}
                 </div>
               ))}
               {filteredTracks.length === 0 && (
@@ -233,6 +276,20 @@ const Discover = () => {
           )}
         </div>
       </div>
+      <AudioPlayer
+        track={currentTrack}
+        playlist={filteredTracks
+          .filter((t) => t.file_url)
+          .map((t) => ({
+            id: t.id,
+            title: t.title,
+            artist: artistNames[t.user_id] || "Unknown Artist",
+            audioUrl: t.file_url as string,
+            coverUrl: t.cover_image_url || undefined,
+          }))}
+        onTrackChange={(t) => setCurrentTrack(t)}
+        onClose={() => setCurrentTrack(null)}
+      />
     </div>
   );
 };
