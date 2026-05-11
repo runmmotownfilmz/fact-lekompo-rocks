@@ -60,7 +60,24 @@ const Discover = () => {
           .limit(20),
       ]);
 
-      if (tracksRes.data) setTracks(tracksRes.data);
+      if (tracksRes.data) {
+        setTracks(tracksRes.data);
+        // Fetch artist display names for tracks
+        const userIds = [...new Set(tracksRes.data.map((t) => t.user_id))];
+        if (userIds.length > 0) {
+          const { data: profs } = await supabase
+            .from("profiles")
+            .select("user_id, display_name, username")
+            .in("user_id", userIds);
+          if (profs) {
+            const map: Record<string, string> = {};
+            profs.forEach((p) => {
+              map[p.user_id] = p.display_name || p.username || "Unknown Artist";
+            });
+            setArtistNames(map);
+          }
+        }
+      }
       if (artistsRes.data) setArtists(artistsRes.data);
       setLoading(false);
     };
