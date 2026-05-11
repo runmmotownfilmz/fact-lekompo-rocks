@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
+import AudioPlayer, { Track } from "@/components/AudioPlayer";
 
 interface DiscoverTrack {
   id: string;
