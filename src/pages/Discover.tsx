@@ -39,6 +39,8 @@ const Discover = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"trending" | "new" | "top" | "artists">("trending");
   const [selectedGenre, setSelectedGenre] = useState("All");
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [artistNames, setArtistNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
