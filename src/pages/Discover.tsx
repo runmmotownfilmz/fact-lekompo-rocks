@@ -276,6 +276,20 @@ const Discover = () => {
           )}
         </div>
       </div>
+      <AudioPlayer
+        track={currentTrack}
+        playlist={filteredTracks
+          .filter((t) => t.file_url)
+          .map((t) => ({
+            id: t.id,
+            title: t.title,
+            artist: artistNames[t.user_id] || "Unknown Artist",
+            audioUrl: t.file_url as string,
+            coverUrl: t.cover_image_url || undefined,
+          }))}
+        onTrackChange={(t) => setCurrentTrack(t)}
+        onClose={() => setCurrentTrack(null)}
+      />
     </div>
   );
 };
