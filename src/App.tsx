@@ -17,6 +17,7 @@ import Learn from "./pages/Learn";
 import AdminDashboard from "./pages/AdminDashboard";
 import TicketSuccess from "./pages/TicketSuccess";
 import ClaimTicket from "./pages/ClaimTicket";
+import VerifyTicket from "./pages/VerifyTicket";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/ticket-success" element={<TicketSuccess />} />
             <Route path="/claim-ticket" element={<ClaimTicket />} />
+            <Route path="/verify-ticket" element={<VerifyTicket />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
