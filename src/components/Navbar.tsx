@@ -186,7 +186,7 @@ const Navbar = () => {
                     key={link.name}
                     href={link.href}
                     className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => handleHashLink(e, link.href)}
                   >
                     {link.name}
                   </a>
