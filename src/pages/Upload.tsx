@@ -16,7 +16,7 @@ interface UploadFile {
   coverImage: File | null;
   title: string;
   description: string;
-  type: "beat" | "mixtape" | "music_pack" | "single";
+  type: "beat" | "mixtape" | "music_pack" | "single" | "plugin";
   bpm: string;
   genre: string;
   price: string;
