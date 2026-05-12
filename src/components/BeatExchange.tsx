@@ -36,6 +36,7 @@ interface BeatExchangeProps {
 }
 
 const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangeProps) => {
+  const navigate = useNavigate();
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [loading, setLoading] = useState(true);
   const [usePlaceholders, setUsePlaceholders] = useState(false);
