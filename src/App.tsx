@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import TicketSuccess from "./pages/TicketSuccess";
 import ClaimTicket from "./pages/ClaimTicket";
 import VerifyTicket from "./pages/VerifyTicket";
+import Beats from "./pages/Beats";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
