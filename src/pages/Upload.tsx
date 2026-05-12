@@ -346,19 +346,23 @@ const UploadPage = () => {
               </div>
             </div>
 
-            {/* Audio File */}
+            {/* Audio / Bundle File */}
             <div className="space-y-2">
-              <Label>Audio File (MP3/WAV) *</Label>
+              <Label>{isBundle ? "Pack / Plugin File (ZIP) *" : "Audio File (MP3/WAV) *"}</Label>
               <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
-                <input type="file" accept="audio/mpeg,audio/wav,audio/mp3" onChange={(e) => updateUpload("audioFile", e.target.files?.[0] || null)} className="hidden" id={`audio-${activeIndex}`} />
+                <input type="file" accept={acceptTypes} onChange={(e) => updateUpload("audioFile", e.target.files?.[0] || null)} className="hidden" id={`audio-${activeIndex}`} />
                 <label htmlFor={`audio-${activeIndex}`} className="cursor-pointer">
                   <UploadIcon className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   {currentUpload.audioFile ? (
                     <p className="text-primary font-medium">{currentUpload.audioFile.name}</p>
                   ) : (
                     <>
-                      <p className="text-foreground font-medium">Drop your audio file here</p>
-                      <p className="text-sm text-muted-foreground">MP3 or WAV format</p>
+                      <p className="text-foreground font-medium">
+                        {isBundle ? "Drop your ZIP bundle here" : "Drop your audio file here"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {isBundle ? "ZIP / RAR — FL Studio packs, sample packs, VSTs" : "MP3 or WAV format"}
+                      </p>
                     </>
                   )}
                 </label>
