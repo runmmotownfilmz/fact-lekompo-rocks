@@ -212,8 +212,11 @@ const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangePr
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
             Upload your Lekompo beats and music packs to reach thousands of artists and fans.
           </p>
-          <Button variant="hero" size="lg">
+          <Button variant="hero" size="lg" onClick={() => navigate("/upload")}>
             Start Selling Beats
+          </Button>
+          <Button variant="outline" size="lg" className="ml-3" onClick={() => navigate("/beats")}>
+            Browse Marketplace
           </Button>
         </div>
       </div>
