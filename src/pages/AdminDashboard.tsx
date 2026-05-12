@@ -696,6 +696,7 @@ const AdminDashboard = () => {
 
           {/* CHECK-IN TAB */}
           <TabsContent value="checkin" className="space-y-6">
+            <ScanStatsWidget />
             <TicketCheckIn />
           </TabsContent>
         </Tabs>
