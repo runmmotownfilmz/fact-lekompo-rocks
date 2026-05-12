@@ -553,6 +553,36 @@ export type Database = {
           },
         ]
       }
+      scan_logs: {
+        Row: {
+          id: string
+          message: string | null
+          qr_code: string
+          scanned_at: string
+          scanned_by: string | null
+          status: string
+          ticket_id: string | null
+        }
+        Insert: {
+          id?: string
+          message?: string | null
+          qr_code: string
+          scanned_at?: string
+          scanned_by?: string | null
+          status: string
+          ticket_id?: string | null
+        }
+        Update: {
+          id?: string
+          message?: string | null
+          qr_code?: string
+          scanned_at?: string
+          scanned_by?: string | null
+          status?: string
+          ticket_id?: string | null
+        }
+        Relationships: []
+      }
       sponsors: {
         Row: {
           created_at: string
