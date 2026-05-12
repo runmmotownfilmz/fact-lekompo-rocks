@@ -53,6 +53,45 @@ export type Database = {
         }
         Relationships: []
       }
+      beat_purchases: {
+        Row: {
+          amount: number
+          buyer_id: string
+          created_at: string
+          currency: string
+          id: string
+          seller_id: string
+          status: string
+          stripe_session_id: string | null
+          updated_at: string
+          upload_id: string
+        }
+        Insert: {
+          amount?: number
+          buyer_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          seller_id: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          upload_id: string
+        }
+        Update: {
+          amount?: number
+          buyer_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          seller_id?: string
+          status?: string
+          stripe_session_id?: string | null
+          updated_at?: string
+          upload_id?: string
+        }
+        Relationships: []
+      }
       event_lineup: {
         Row: {
           artist_name: string

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Play, Pause, Download, Heart, Music2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,6 +36,7 @@ interface BeatExchangeProps {
 }
 
 const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangeProps) => {
+  const navigate = useNavigate();
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [loading, setLoading] = useState(true);
   const [usePlaceholders, setUsePlaceholders] = useState(false);
@@ -142,7 +144,7 @@ const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangePr
                         <span className="font-display text-xl text-primary">R{beat.price}</span>
                         <div className="flex gap-2">
                           <Button variant="ghost" size="icon" className="h-9 w-9"><Heart className="w-4 h-4" /></Button>
-                          <Button variant="default" size="sm"><Download className="w-4 h-4" />Buy</Button>
+                          <Button variant="default" size="sm" onClick={() => navigate("/beats")}><Download className="w-4 h-4" />Buy</Button>
                         </div>
                       </div>
                     </CardContent>
@@ -193,7 +195,7 @@ const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangePr
                           </span>
                           <div className="flex gap-2">
                             <Button variant="ghost" size="icon" className="h-9 w-9"><Heart className="w-4 h-4" /></Button>
-                            <Button variant="default" size="sm"><Download className="w-4 h-4" />Buy</Button>
+                            <Button variant="default" size="sm" onClick={() => navigate("/beats")}><Download className="w-4 h-4" />Buy</Button>
                           </div>
                         </div>
                       </CardContent>
@@ -210,8 +212,11 @@ const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangePr
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
             Upload your Lekompo beats and music packs to reach thousands of artists and fans.
           </p>
-          <Button variant="hero" size="lg">
+          <Button variant="hero" size="lg" onClick={() => navigate("/upload")}>
             Start Selling Beats
+          </Button>
+          <Button variant="outline" size="lg" className="ml-3" onClick={() => navigate("/beats")}>
+            Browse Marketplace
           </Button>
         </div>
       </div>

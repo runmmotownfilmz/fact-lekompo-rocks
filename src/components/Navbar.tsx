@@ -13,7 +13,7 @@ const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Events", href: "#billboards" },
   { name: "Discover", href: "/discover", isRoute: true },
-  { name: "Beat Exchange", href: "#beats" },
+  { name: "Beat Exchange", href: "/beats", isRoute: true },
   { name: "Playlists", href: "/playlists", isRoute: true },
   { name: "Merch", href: "#merch" },
   { name: "Learn", href: "/learn", isRoute: true },
