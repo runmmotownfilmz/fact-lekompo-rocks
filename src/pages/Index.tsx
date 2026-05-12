@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Events from "@/components/Events";
@@ -16,10 +17,20 @@ import { useCartSync } from "@/hooks/useCartSync";
 
 const Index = () => {
   useCartSync();
+  const location = useLocation();
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [playlist, setPlaylist] = useState<Track[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 150);
+    }
+  }, [location.hash]);
 
   const handlePlayTrack = useCallback((track: Track, tracks: Track[]) => {
     setCurrentTrack(track);

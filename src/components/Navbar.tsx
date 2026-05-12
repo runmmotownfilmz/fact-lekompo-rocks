@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Upload, User, LogOut, BarChart3, GraduationCap, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +26,22 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleHashLink = (e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+    const id = href.replace("#", "");
+    if (location.pathname !== "/") {
+      navigate("/#" + id);
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      window.history.replaceState(null, "", "#" + id);
+    }
+  };
 
   useEffect(() => {
     if (!user) { setPendingCount(0); return; }
@@ -74,6 +90,7 @@ const Navbar = () => {
                 <a
                   key={link.name}
                   href={link.href}
+                  onClick={(e) => handleHashLink(e, link.href)}
                   className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                 >
                   {link.name}
@@ -169,7 +186,7 @@ const Navbar = () => {
                     key={link.name}
                     href={link.href}
                     className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => handleHashLink(e, link.href)}
                   >
                     {link.name}
                   </a>
