@@ -194,8 +194,14 @@ const UploadPage = () => {
     { value: "beat", label: "Beat" },
     { value: "single", label: "Single" },
     { value: "mixtape", label: "Mixtape" },
-    { value: "music_pack", label: "Music Pack" },
+    { value: "music_pack", label: "FL Music Pack" },
+    { value: "plugin", label: "Plugin / VST" },
   ];
+
+  const isBundle = currentUpload.type === "music_pack" || currentUpload.type === "plugin";
+  const acceptTypes = isBundle
+    ? "application/zip,application/x-zip-compressed,.zip,.rar,.7z,audio/mpeg,audio/wav"
+    : "audio/mpeg,audio/wav,audio/mp3";
 
   return (
     <div className="min-h-screen bg-background">
