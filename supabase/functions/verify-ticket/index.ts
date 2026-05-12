@@ -93,6 +93,14 @@ serve(async (req) => {
       },
     };
 
+    await supabase.from("scan_logs").insert({
+      qr_code: code,
+      ticket_id: ticket.id,
+      status: payload.status,
+      message: payload.message,
+      scanned_by: userData.user.id,
+    });
+
     return new Response(JSON.stringify(payload), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
