@@ -144,7 +144,7 @@ const BeatExchange = ({ onPlayTrack, currentTrackId, isPlaying }: BeatExchangePr
                         <span className="font-display text-xl text-primary">R{beat.price}</span>
                         <div className="flex gap-2">
                           <Button variant="ghost" size="icon" className="h-9 w-9"><Heart className="w-4 h-4" /></Button>
-                          <Button variant="default" size="sm"><Download className="w-4 h-4" />Buy</Button>
+                          <Button variant="default" size="sm" onClick={() => navigate("/beats")}><Download className="w-4 h-4" />Buy</Button>
                         </div>
                       </div>
                     </CardContent>
