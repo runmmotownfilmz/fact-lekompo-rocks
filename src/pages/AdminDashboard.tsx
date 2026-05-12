@@ -26,6 +26,7 @@ import TicketTierManager from "@/components/admin/TicketTierManager";
 import TicketCheckIn from "@/components/admin/TicketCheckIn";
 import TicketAnalytics from "@/components/admin/TicketAnalytics";
 import PayFastSandboxTest from "@/components/admin/PayFastSandboxTest";
+import ScanStatsWidget from "@/components/admin/ScanStatsWidget";
 
 interface Event {
   id: string;
