@@ -46,6 +46,13 @@ serve(async (req) => {
       .maybeSingle();
 
     if (error || !ticket) {
+      await supabase.from("scan_logs").insert({
+        qr_code: code,
+        ticket_id: null,
+        status: "not_found",
+        message: "Ticket not found",
+        scanned_by: userData.user.id,
+      });
       return new Response(
         JSON.stringify({ valid: false, status: "not_found", message: "Ticket not found. Invalid QR code." }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
